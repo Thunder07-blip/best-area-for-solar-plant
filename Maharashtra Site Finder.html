@@ -66,7 +66,7 @@ footer{padding:0 28px 24px;color:var(--mute);font-size:13px;line-height:1.5}
 <main>
   <section class="card">
     <h2 id="mt">Solar suitability by district</h2>
-    <svg id="map" viewBox="0 0 640 420" role="img" aria-label="District map of Maharashtra"></svg>
+    <svg id="map" viewBox="0 0 710 420" role="img" aria-label="District map of Maharashtra"></svg>
     <div class="legend"><span>Low (Score 0)</span><i id="lg"></i><span>High (Score 100)</span></div>
   </section>
   <div class="side">
@@ -190,12 +190,12 @@ function color(s) {
   return "rgb(" + [0, 1, 2].map(c => Math.round(r[i][c] + (r[i + 1][c] - r[i][c]) * u)).join(",") + ")";
 }
 
-const svg = document.getElementById("map"), S = 62, G = 4;
+const svg = document.getElementById("map"), S = 58, G = 8, PAD_X = 29, PAD_Y = 16;
 
 function draw() {
   const sc = DATA.map(score);
   svg.innerHTML = DATA.map((d, i) => {
-    const x = d[1] * (S + G) + 8, y = d[2] * (S + G) + 8;
+    const x = d[1] * (S + G) + PAD_X, y = d[2] * (S + G) + PAD_Y;
     const nm = d[0].replace("Chh. Sambhajinagar", "Sambhajinagar");
     return `<g>
       <rect class="tile${sel === i ? " sel" : ""}" data-i="${i}" x="${x}" y="${y}" width="${S}" height="${S}" rx="6" fill="${color(sc[i])}" tabindex="0" role="button" aria-label="${d[0]} score ${sc[i].toFixed(1)}"/>

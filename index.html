@@ -197,9 +197,12 @@ header {
 /* SVG Map */
 svg#map {
   width: 100%;
+  max-width: 100%;
   height: auto;
   display: block;
+  margin: 0 auto;
   filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+  overflow: visible;
 }
 .tile {
   cursor: pointer;
@@ -619,7 +622,7 @@ svg#map {
   <div class="brand">
     <div class="brand-logo">⚡</div>
     <div>
-      <h1>Maharashtra Site Finder <span class="live-badge"><span class="pulse-dot"></span> Live Port 3000 • Fully Validated</span></h1>
+      <h1>Maharashtra Site Finder <span class="live-badge"><span class="pulse-dot"></span> Live Port 8000 • Fully Validated</span></h1>
       <p style="font-size:12px;color:var(--text-sub);">Multi-Criteria Decision Analysis &amp; Empirical Validation Platform for Renewable Energy</p>
     </div>
   </div>
@@ -631,18 +634,6 @@ svg#map {
     <button class="tab-btn" data-tab="validation">🔬 ML Validation</button>
     <button class="tab-btn" data-tab="sensitivity">📊 Sensitivity &amp; Tiers</button>
   </nav>
-
-  <div style="display:flex;align-items:center;gap:8px;">
-    <a href="slides.html" style="text-decoration:none;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text-main);font-weight:600;font-size:12.5px;padding:8px 12px;border-radius:8px;display:inline-flex;align-items:center;gap:5px;transition:all 0.2s;">
-      📊 Slides
-    </a>
-    <a href="docs/" style="text-decoration:none;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text-main);font-weight:600;font-size:12.5px;padding:8px 12px;border-radius:8px;display:inline-flex;align-items:center;gap:5px;transition:all 0.2s;">
-      📚 Docs
-    </a>
-    <button id="pres-btn" style="background:linear-gradient(135deg,#3b82f6,#2563eb);border:0;color:#fff;font-weight:700;font-size:12.5px;padding:8px 14px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;">
-      🎙️ Presenter Cue
-    </button>
-  </div>
 </header>
 
 <div class="container">
@@ -665,7 +656,7 @@ svg#map {
           </div>
         </div>
 
-        <svg id="map" viewBox="0 0 640 420" role="img" aria-label="District Tile Grid"></svg>
+        <svg id="map" viewBox="0 0 710 420" role="img" aria-label="District Tile Grid"></svg>
 
         <div class="legend-bar">
           <span>Low Suitability (0)</span>
@@ -1266,15 +1257,15 @@ function interpolateColor(score) {
 }
 
 const svg = document.getElementById("map");
-const S = 62, G = 4;
+const S = 58, G = 8, PAD_X = 29, PAD_Y = 16;
 
 function renderStudio() {
   const scores = DATA.map(calculateScore);
   
   // Render Map SVG
   svg.innerHTML = DATA.map((d, i) => {
-    const x = d.col * (S + G) + 8;
-    const y = d.row * (S + G) + 8;
+    const x = d.col * (S + G) + PAD_X;
+    const y = d.row * (S + G) + PAD_Y;
     const isSel = (i === selectedIdx);
     const nm = d.name.replace("Chh. Sambhajinagar", "Sambhajinagar");
     const sc = scores[i].toFixed(1);
@@ -1283,7 +1274,7 @@ function renderStudio() {
     return `<g>
       <rect class="tile${isSel ? ' sel' : ''}" data-i="${i}" x="${x}" y="${y}" width="${S}" height="${S}" rx="8" fill="${fill}" tabindex="0" role="button" aria-label="${d.name} score ${sc}"/>
       <text class="lbl-name" x="${x + S/2}" y="${y + S/2 - 3}">${nm.length > 9 ? nm.slice(0, 8) + '…' : nm}</text>
-      <text class="lbl-score" x="${x + S/2}" y="${y + S/2 + 12}">${scores[i].toFixed(0)}</text>
+      <text class="lbl-score" x="${x + S/2}" y="${y + S/2 + 13}">${scores[i].toFixed(0)}</text>
     </g>`;
   }).join("");
 
@@ -1474,9 +1465,11 @@ document.querySelectorAll(".problem-header").forEach(header => {
 
 /* Presenter Modal */
 const modal = document.getElementById("pres-modal");
-document.getElementById("pres-btn").onclick = () => { modal.classList.add("active"); };
-document.getElementById("modal-close-btn").onclick = () => { modal.classList.remove("active"); };
-modal.onclick = (e) => { if (e.target === modal) modal.classList.remove("active"); };
+const presBtn = document.getElementById("pres-btn");
+if (presBtn) presBtn.onclick = () => { modal.classList.add("active"); };
+const closeBtn = document.getElementById("modal-close-btn");
+if (closeBtn) closeBtn.onclick = () => { modal.classList.remove("active"); };
+if (modal) modal.onclick = (e) => { if (e.target === modal) modal.classList.remove("active"); };
 
 /* Keyboard Shortcuts */
 window.addEventListener("keydown", e => {
@@ -1488,8 +1481,8 @@ window.addEventListener("keydown", e => {
   if (e.key.toLowerCase() === "s") document.querySelector('.mode-btn[data-m="solar"]').click();
   if (e.key.toLowerCase() === "w") document.querySelector('.mode-btn[data-m="wind"]').click();
   if (e.key.toLowerCase() === "h") document.querySelector('.mode-btn[data-m="hybrid"]').click();
-  if (e.key.toLowerCase() === "p") document.getElementById("pres-btn").click();
-  if (e.key === "Escape") modal.classList.remove("active");
+  if (e.key.toLowerCase() === "p" && modal) modal.classList.toggle("active");
+  if (e.key === "Escape" && modal) modal.classList.remove("active");
 });
 
 // Initial boot

@@ -172,6 +172,7 @@ D:\cp-pe\
 ├── docs\
 │   └── index.html                        # Comprehensive Technical Documentation & Problem Solutions
 │
+├── server.py                             # FastAPI server hosting dashboard, slides, and docs
 ├── index.html                            # Primary 5-Tab Interactive Siting Studio & Decision Dashboard
 ├── slides.html                           # 5-Minute Presentation Slide Deck (Fullscreen, Cues & Timer)
 ├── presentation.html                     # Redirect / alias to slides.html
@@ -186,9 +187,25 @@ D:\cp-pe\
 
 ## 8. How to Run & Present
 
+### Running the Live FastAPI Server
+Launch the unified server to host all components on dedicated routes:
+```bash
+python server.py
+# Or with uvicorn directly:
+uvicorn server:app --host 127.0.0.1 --port 8000
+```
+
+Once running, navigate to:
+- **Interactive Siting Studio & Heatmap**: [http://localhost:8000/](http://localhost:8000/)
+- **5-Minute Presentation Slide Deck**: [http://localhost:8000/slides](http://localhost:8000/slides)
+- **Technical Documentation & Problem Cards**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **District Feature & Ranking API**: [http://localhost:8000/api/districts](http://localhost:8000/api/districts)
+- **Taluka Granular API (150 talukas)**: [http://localhost:8000/api/talukas](http://localhost:8000/api/talukas)
+- **OpenAPI Swagger UI**: [http://localhost:8000/api/swagger](http://localhost:8000/api/swagger)
+
 ### Pipeline Execution
-- **Prerequisites**: Python 3.10+ with `pandas`, `numpy`, `scipy`, `scikit-learn`, `pillow`
-- **Execute complete pipeline**:
+- **Prerequisites**: Python 3.10+ with `pandas`, `numpy`, `scipy`, `scikit-learn`, `pillow`, `fastapi`, `uvicorn`
+- **Execute complete data & ML pipeline**:
   ```bash
   python scripts/run_all.py
   ```

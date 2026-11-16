@@ -1,0 +1,68 @@
+With one day left, the rule is to cut scope until the core works end to end, then add extras only if time remains. Here’s a plan built around that.
+
+MVPs to deliver (in priority order)
+
+MVP 1 (must ship): Data pipeline to feature table
+Your collected datasets become one clean district_features.csv (or taluka-level if your boundaries are ready). Deliverable: the raw files, the cleaning script, and the final CSV.
+
+MVP 2 (must ship): Scoring engine
+Min-max normalization, AHP weights with consistency ratio, and a 0 to 100 score for solar and wind. Deliverable: results.csv with ranked areas.
+
+MVP 3 (must ship): Interactive dashboard
+The map with a Solar/Wind toggle, weight sliders, Top 5 list and detail card, now fed by your real CSV instead of sample numbers.
+
+MVP 4 (if time allows): Validation
+Random Forest against existing plants, with AUC and Spearman correlation.
+
+MVP 5 (stretch, only if 1 to 4 are done): Sensitivity analysis and clustering
+These are already in the script, so they cost little to run. Keep them off the critical path.
+
+If you run out of time, MVP 4 and 5 become “future work” slides. Don’t present anything you haven’t run.
+
+Architecture
+Raw datasets (rasters, CSVs, boundaries, OSM)
+        |
+   [1] Ingestion and cleaning (pandas / GeoPandas)
+        |   same CRS, handle missing values, units
+   [2] Feature engineering
+        |   zonal stats, distance to grid -> feature_table.csv
+   [3] Scoring engine
+        |   normalize -> AHP weights -> score (solar, wind)
+   [4] Validation (Random Forest, CV)  --> metrics
+        |
+   [5] Export results.csv / results.json
+        |
+   [6] Dashboard (single HTML file, reads the data)
+
+The key design choice for a one-day deadline is that the dashboard has no backend. The Python pipeline writes a results file, and the page reads it. That removes servers, hosting and deployment as failure points.
+
+Engineering problems and solutions
+
+Document these as problems you actually hit. If you didn’t hit one, drop it rather than claiming it. These are the ones almost everyone meets in this kind of project:
+
+Problem	Why it matters	Solution
+Datasets use different CRS	Layers don’t overlap, so averages are wrong	Reproject everything to one CRS; use a metre-based CRS for distances
+Different resolutions and units	Cannot compare kWh/m², m/s, km and % directly	Min-max normalization; invert factors where smaller is better
+Name mismatches (district spellings such as Ahmednagar/Ahilyanagar, Osmanabad/Dharashiv)	Joins silently drop rows	Build a name-mapping table; check row counts after every merge
+Missing values	NaNs break scoring	Check isna(), then impute or exclude with a stated rule
+Hand-picked weights are arbitrary	Examiner asks “why 40%?”	AHP with a consistency ratio, plus ±20% Monte Carlo sensitivity
+No ground truth for “good site”	Cannot show the model is right	Use existing plants (OpenStreetMap) as proxy labels for validation
+Class imbalance in validation labels	Few areas have plants, so accuracy is misleading	Use AUC instead of accuracy and class_weight="balanced"
+Dashboard can’t load remote map tiles or files	Map is blank on hosted pages	Embed the data and a tile-style layout in the page
+Plan for today (adjust to your hours)
+Block	Task	Done when
+1	Inspect your datasets: columns, units, CRS, missing values	You can list each dataset’s source and unit
+2	Clean and merge into the feature table	df.shape and df.isna().sum() look right
+3	Scoring plus AHP	Top 5 for solar and wind make rough sense
+4	Validation (and sensitivity if quick)	You have an AUC, whatever it is
+5	Wire the real CSV into the dashboard	Map shows your real scores
+6	Update the PPT with real numbers and the architecture slide	No [__] placeholders left
+7	Rehearse the 5-minute story: problem, data, method, result, limits	You can explain every number
+
+Stop building at least 2 hours before the deadline and use that time for the slides and rehearsal.
+
+Submission checklist
+Repo with data/raw, data/processed, the script, and a README with run instructions
+Dashboard file
+PPT with real numbers and an architecture slide
+A short list of limitations stated by you

@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>5-Minute Presentation Slide Deck | Maharashtra Renewable Energy Site Finder</title>
+<style>
+:root {
+  --bg-space: #070b12;
+  --bg-card: #0f172a;
+  --bg-card-alt: #131d35;
+  --border: #1e293b;
+  --border-glow: #38bdf8;
+  --text-main: #f8fafc;
+  --text-mute: #94a3b8;
+  --text-sub: #64748b;
+  --solar-gold: #f59e0b;
+  --wind-cyan: #06b6d4;
+  --hybrid-emerald: #10b981;
+  --accent-blue: #3b82f6;
+  --danger-red: #ef4444;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-space);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Helvetica, Arial, sans-serif;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Slide Deck Container */
+#deck {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 40px 60px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(40px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  overflow-y: auto;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+/* Slide Header */
+.slide-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--wind-cyan);
+  margin-bottom: 8px;
+}
+.slide-title {
+  font-size: clamp(26px, 3.2vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #ffffff 40%, var(--text-mute) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.slide-sub {
+  font-size: clamp(14px, 1.4vw, 17px);
+  color: var(--text-mute);
+  margin-bottom: 24px;
+  max-width: 900px;
+}
+
+/* Grid & Cards */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+  position: relative;
+}
+.card.highlight {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: linear-gradient(145deg, var(--bg-card), var(--bg-card-alt));
+}
+
+/* Tables */
+table.slide-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+table.slide-table th {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-mute);
+  text-align: left;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+table.slide-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-variant-numeric: tabular-nums;
+}
+table.slide-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.badge-gold { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+.badge-cyan { background: rgba(6, 182, 212, 0.2); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.4); }
+.badge-emerald { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+
+/* Speaker cue card overlay */
+.cue-card {
+  position: absolute;
+  bottom: 80px;
+  right: 40px;
+  width: 380px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid var(--border-glow);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+  font-size: 13px;
+  line-height: 1.5;
+  display: none;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+}
+.cue-card.visible { display: block; }
+.cue-card h4 {
+  color: var(--border-glow);
+  font-size: 12px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Control Bar */
+#controls {
+  height: 64px;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  z-index: 100;
+}
+.ctrl-group { display: flex; align-items: center; gap: 12px; }
+
+.btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.btn:hover { background: rgba(255, 255, 255, 0.12); border-color: var(--text-mute); }
+.btn-primary { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; }
+.btn-primary:hover { background: #2563eb; }
+
+/* Progress Bar */
+#progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--solar-gold), var(--wind-cyan), var(--hybrid-emerald));
+  width: 16.66%;
+  transition: width 0.3s ease;
+  z-index: 110;
+}
+
+/* Timer */
+.timer-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: monospace;
+  font-size: 15px;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.timer-dot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+}
+.timer-dot.warning { background: #f59e0b; }
+.timer-dot.danger { background: #ef4444; animation: blink 1s infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* Dots navigation */
+.slide-dots {
+  display: flex;
+  gap: 8px;
+}
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.dot.active {
+  background: var(--border-glow);
+  transform: scale(1.25);
+}
+
+/* Architecture Flow in SVG */
+.arch-diagram {
+  width: 100%;
+  max-height: 480px;
+}
+
+@media print {
+  body { overflow: visible; height: auto; background: #fff; color: #000; }
+  #controls, #progress-bar, .cue-card { display: none !important; }
+  .slide { position: relative; opacity: 1; transform: none; display: block !important; page-break-after: always; height: 100vh; padding: 40px; }
+  .card { border: 1px solid #ccc; background: #fafafa; color: #111; box-shadow: none; }
+  .slide-title { color: #000; -webkit-text-fill-color: initial; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<main id="deck">
+
+  <!-- ==================== SLIDE 1 ==================== -->
+  <section class="slide active" id="slide-1" data-cue="Hook: Renewable siting carries multi-crore risks. Choosing the wrong district causes transmission bottlenecks, grid curtailment, or land delays. We built an end-to-end data pipeline + AHP MCDM engine + ML validation to solve this objectively.">
+    <div class="slide-tag">⏱️ 0:00 - 0:45 &bull; Slide 1 of 6</div>
+    <h1 class="slide-title">Spatial Decision Support System for Utility-Scale Renewable Siting</h1>
+    <p class="slide-sub">Data-Driven Multi-Criteria Site Suitability for Solar, Wind, and Co-Located Hybrid Energy Across Maharashtra</p>
+    
+    <div class="grid-3" style="margin-top: 10px;">
+      <div class="card highlight">
+        <div style="font-size:28px;margin-bottom:8px;">🎯</div>
+        <h3 style="font-size:18px;margin-bottom:8px;">The Core Problem</h3>
+        <p style="font-size:13.5px;color:var(--text-mute);line-height:1.5;">
+          Utility-scale plants require <strong>₹4–5 Crore per MW</strong>. Siting decisions historically suffer from subjective heuristics, missing transmission capacity data, or ignoring co-location synergy, leading to curtailment and stranded CapEx.
+        </p>
+      </div>
+
+      <div class="card highlight">
+        <div style="font-size:28px;margin-bottom:8px;">⚡</div>
+        <h3 style="font-size:18px;margin-bottom:8px;">Our Solution</h3>
+        <p style="font-size:13.5px;color:var(--text-mute);line-height:1.5;">
+          An automated, reproducible spatial analytics pipeline evaluating all <strong>34 Maharashtra districts</strong> across solar irradiance, wind power density, substation proximity, wasteland percentage, and slope.
+        </p>
+      </div>
+
+      <div class="card highlight">
+        <div style="font-size:28px;margin-bottom:8px;">🏆</div>
+        <h3 style="font-size:18px;margin-bottom:8px;">Key Deliverables</h3>
+        <ul style="font-size:13px;color:var(--text-mute);line-height:1.6;margin-left:16px;">
+          <li>Automated 5-stage Python data science pipeline</li>
+          <li>Mathematically proven Saaty AHP weights ($CR < 0.01$)</li>
+          <li>Machine Learning validation (ROC AUC $0.90$ / $0.95$)</li>
+          <li>Zero-dependency interactive GIS decision dashboard</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px; display: flex; gap: 16px; flex-wrap: wrap;">
+      <div class="badge badge-gold" style="font-size:12px;padding:6px 14px;">☀️ Global Solar Atlas v2 Rasters (250m)</div>
+      <div class="badge badge-cyan" style="font-size:12px;padding:6px 14px;">💨 333,033 Hourly Wind Telemetry Obs</div>
+      <div class="badge badge-emerald" style="font-size:12px;padding:6px 14px;">⚡ MahaTransco Substation Distances</div>
+      <div class="badge badge-gold" style="font-size:12px;padding:6px 14px;">🛰️ ISRO Bhuvan Wasteland Land Atlas</div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 2 ==================== -->
+  <section class="slide" id="slide-2" data-cue="Architecture: Strict separation of concerns. Heavy Python data science processes rasters and telemetry offline to write clean static feature tables. The HTML/SVG dashboard has zero server dependencies, guaranteeing 100% offline uptime with real-time AHP recalculation.">
+    <div class="slide-tag">⏱️ 0:45 - 1:30 &bull; Slide 2 of 6</div>
+    <h1 class="slide-title">End-to-End System Architecture</h1>
+    <p class="slide-sub">Robust pipeline with strict separation between offline geospatial processing and client-side interactive decision support.</p>
+
+    <div class="card" style="padding: 18px;">
+      <svg class="arch-diagram" viewBox="0 0 1000 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Stage 1 -->
+        <rect x="20" y="30" width="160" height="130" rx="8" fill="#131d35" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="100" y="58" fill="#38bdf8" font-size="12" font-weight="bold" text-anchor="middle">1. RAW DATA SOURCES</text>
+        <text x="100" y="82" fill="#e2e8f0" font-size="11" text-anchor="middle">• GSA v2 GeoTIFFs</text>
+        <text x="100" y="102" fill="#e2e8f0" font-size="11" text-anchor="middle">• WRIS/IMD Telemetry</text>
+        <text x="100" y="122" fill="#e2e8f0" font-size="11" text-anchor="middle">• MSETCL Grid Substation</text>
+        <text x="100" y="142" fill="#e2e8f0" font-size="11" text-anchor="middle">• ISRO Wasteland Atlas</text>
+
+        <!-- Arrow 1 to 2 -->
+        <path d="M180 95 L220 95" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- Stage 2 -->
+        <rect x="220" y="30" width="160" height="130" rx="8" fill="#131d35" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="300" y="58" fill="#38bdf8" font-size="12" font-weight="bold" text-anchor="middle">2. DATA PIPELINE</text>
+        <text x="300" y="78" fill="#94a3b8" font-size="10" text-anchor="middle">(01_data_pipeline.py)</text>
+        <text x="300" y="102" fill="#e2e8f0" font-size="11" text-anchor="middle">• Spatial pixel sampling</text>
+        <text x="300" y="122" fill="#e2e8f0" font-size="11" text-anchor="middle">• Name reconciliation</text>
+        <text x="300" y="142" fill="#e2e8f0" font-size="11" text-anchor="middle">• Outlier bound filtering</text>
+
+        <!-- Arrow 2 to 3 -->
+        <path d="M380 95 L420 95" stroke="#38bdf8" stroke-width="2"/>
+
+        <!-- Stage 3 -->
+        <rect x="420" y="30" width="160" height="130" rx="8" fill="#131d35" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="500" y="58" fill="#fbbf24" font-size="12" font-weight="bold" text-anchor="middle">3. SCORING ENGINE</text>
+        <text x="500" y="78" fill="#94a3b8" font-size="10" text-anchor="middle">(02_scoring_engine.py)</text>
+        <text x="500" y="102" fill="#e2e8f0" font-size="11" text-anchor="middle">• Saaty AHP weights</text>
+        <text x="500" y="122" fill="#e2e8f0" font-size="11" text-anchor="middle">• Consistency Ratio CR</text>
+        <text x="500" y="142" fill="#e2e8f0" font-size="11" text-anchor="middle">• Min-Max normalization</text>
+
+        <!-- Arrow 3 to 4 -->
+        <path d="M580 95 L620 95" stroke="#f59e0b" stroke-width="2"/>
+
+        <!-- Stage 4 -->
+        <rect x="620" y="30" width="160" height="130" rx="8" fill="#131d35" stroke="#10b981" stroke-width="1.5"/>
+        <text x="700" y="58" fill="#34d399" font-size="12" font-weight="bold" text-anchor="middle">4. VALIDATION & ML</text>
+        <text x="700" y="78" fill="#94a3b8" font-size="10" text-anchor="middle">(03_validation_ml.py)</text>
+        <text x="700" y="102" fill="#e2e8f0" font-size="11" text-anchor="middle">• Random Forest LOOCV</text>
+        <text x="700" y="122" fill="#e2e8f0" font-size="11" text-anchor="middle">• ROC AUC: 0.902 / 0.952</text>
+        <text x="700" y="142" fill="#e2e8f0" font-size="11" text-anchor="middle">• Spearman rho = 0.83</text>
+
+        <!-- Arrow 4 to 5 -->
+        <path d="M780 95 L820 95" stroke="#10b981" stroke-width="2"/>
+
+        <!-- Stage 5 -->
+        <rect x="820" y="30" width="160" height="130" rx="8" fill="#131d35" stroke="#06b6d4" stroke-width="1.5"/>
+        <text x="900" y="58" fill="#22d3ee" font-size="12" font-weight="bold" text-anchor="middle">5. SENSITIVITY & TIERS</text>
+        <text x="900" y="78" fill="#94a3b8" font-size="10" text-anchor="middle">(04_sensitivity.py)</text>
+        <text x="900" y="102" fill="#e2e8f0" font-size="11" text-anchor="middle">• 1,000 Monte Carlo runs</text>
+        <text x="900" y="122" fill="#e2e8f0" font-size="11" text-anchor="middle">• K-Means Siting Tiers</text>
+        <text x="900" y="142" fill="#e2e8f0" font-size="11" text-anchor="middle">• Top-5 stability: 100%</text>
+
+        <!-- Bottom Flow to Dashboard -->
+        <path d="M500 160 L500 220" stroke="#38bdf8" stroke-width="2"/>
+        <rect x="250" y="220" width="500" height="110" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+        <text x="500" y="250" fill="#38bdf8" font-size="15" font-weight="bold" text-anchor="middle">STANDALONE INTERACTIVE GIS DASHBOARD (index.html)</text>
+        <text x="500" y="275" fill="#f8fafc" font-size="12" text-anchor="middle">• Zero-dependency single HTML file with embedded datasets (34 districts & 150 talukas)</text>
+        <text x="500" y="295" fill="#94a3b8" font-size="11" text-anchor="middle">• Dynamic real-time client-side AHP recalculation &bull; SVG tile map &bull; Instant ranking</text>
+        <text x="500" y="315" fill="#34d399" font-size="11" font-weight="bold" text-anchor="middle">✔ Zero server dependencies &bull; Zero network failure points &bull; Complete offline execution</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 3 ==================== -->
+  <section class="slide" id="slide-3" data-cue="Data & Engineering: Highlight the three major problems solved: 1) Multi-resolution raster grids from 12,800 down to 960 sampled via coordinate projection; 2) Administrative name changes (Ahilyanagar, Chh. Sambhajinagar, Dharashiv) mapped to avoid silent merge drops; 3) Physical bounds filtering to remove telemetry sensor anomalies.">
+    <div class="slide-tag">⏱️ 1:30 - 2:30 &bull; Slide 3 of 6</div>
+    <h1 class="slide-title">Data Ingestion & Engineering Challenges Solved</h1>
+    <p class="slide-sub">Real-world messy data pipelines require strict geospatial harmonization, robust sanity checks, and schema reconciliation.</p>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="badge badge-cyan" style="margin-bottom:12px;">Problem 1: Multi-Resolution Grids</div>
+        <h4 style="font-size:16px;margin-bottom:8px;">Raster Dimension Disparity</h4>
+        <p style="font-size:13px;color:var(--text-mute);line-height:1.5;margin-bottom:12px;">
+          GSA GeoTIFFs arrived at vastly different native dimensions: GHI/DNI at $12,800\times12,800$, PVOUT/TEMP at $3,840\times3,840$, and OPTA at $960\times960$.
+        </p>
+        <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;font-size:12px;border-left:3px solid var(--wind-cyan);">
+          <strong>Solution:</strong> Exact coordinate projection bounding box transforms and bilinear spatial sampling across 77 ground station centroids.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="badge badge-gold" style="margin-bottom:12px;">Problem 2: Maharashtra Name Updates</div>
+        <h4 style="font-size:16px;margin-bottom:8px;">Administrative Discrepancies</h4>
+        <p style="font-size:13px;color:var(--text-mute);line-height:1.5;margin-bottom:12px;">
+          Recent official renamings created silent join drops (Ahmednagar $\rightarrow$ Ahilyanagar, Aurangabad $\rightarrow$ Chh. Sambhajinagar, Osmanabad $\rightarrow$ Dharashiv).
+        </p>
+        <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;font-size:12px;border-left:3px solid var(--solar-gold);">
+          <strong>Solution:</strong> Built a comprehensive bidirectional name reconciliation dictionary with automated pre-merge row assertions (34 / 34 districts verified).
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="badge badge-emerald" style="margin-bottom:12px;">Problem 3: Telemetry Sensor Noise</div>
+        <h4 style="font-size:16px;margin-bottom:8px;">Spurious Sensor Readings</h4>
+        <p style="font-size:13px;color:var(--text-mute);line-height:1.5;margin-bottom:12px;">
+          Raw telemetry feeds included unphysical negative rainfall and saturated 100%+ humidity spikes caused by station line faults.
+        </p>
+        <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;font-size:12px;border-left:3px solid var(--hybrid-emerald);">
+          <strong>Solution:</strong> Enforced domain physical bounding filters ($0 \le \text{Rain} \le 300\text{ mm}$, $5\% \le \text{RH} \le 100\%$, $0 \le \text{Wind} \le 80\text{ km/h}$) before aggregation.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 4 ==================== -->
+  <section class="slide" id="slide-4" data-cue="Methodology: If the examiner asks 'Why 45% for resource and 22% for grid?', the answer is Saaty's Analytic Hierarchy Process. Our pairwise comparison matrices yield Consistency Ratios of 0.0001 for solar and 0.0057 for wind—orders of magnitude below the 0.10 threshold.">
+    <div class="slide-tag">⏱️ 2:30 - 3:15 &bull; Slide 4 of 6</div>
+    <h1 class="slide-title">Methodology — Why These Weights?</h1>
+    <p class="slide-sub">Zero arbitrary hand-picked numbers: Criteria weights derived through Saaty's Analytic Hierarchy Process (AHP) with mathematical consistency proofs.</p>
+
+    <div class="grid-2">
+      <!-- Solar AHP -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h3 style="color:var(--solar-gold);font-size:17px;">☀️ Solar Criteria Weights (Saaty AHP)</h3>
+          <span class="badge badge-emerald">CR = 0.0001 &lt;&lt; 0.10</span>
+        </div>
+        <table class="slide-table" style="margin-bottom:14px;">
+          <thead><tr><th>Criterion</th><th>Factor Type</th><th>AHP Weight</th><th>Saaty Priority</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Solar Resource (GHI)</strong></td><td>Benefit</td><td><strong>44.8%</strong></td><td>Principal Driver</td></tr>
+            <tr><td><strong>Substation Proximity</strong></td><td>Cost (Inverted)</td><td><strong>22.4%</strong></td><td>CapEx Evacuation</td></tr>
+            <tr><td><strong>Barren Wasteland</strong></td><td>Benefit</td><td><strong>18.1%</strong></td><td>Land Acquisition</td></tr>
+            <tr><td><strong>Terrain Flatness (Slope)</strong></td><td>Cost (Inverted)</td><td><strong>14.8%</strong></td><td>Array Civil Works</td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:12px;color:var(--text-mute);">
+          $\lambda_{\max} = 4.0002$, $\text{CI} = 0.0001$, $\text{RI} = 0.90 \implies \mathbf{CR = 0.0001}$ (Mathematically Consistent)
+        </div>
+      </div>
+
+      <!-- Wind AHP -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h3 style="color:var(--wind-cyan);font-size:17px;">💨 Wind Criteria Weights (Saaty AHP)</h3>
+          <span class="badge badge-emerald">CR = 0.0057 &lt;&lt; 0.10</span>
+        </div>
+        <table class="slide-table" style="margin-bottom:14px;">
+          <thead><tr><th>Criterion</th><th>Factor Type</th><th>AHP Weight</th><th>Saaty Priority</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Wind Density (WPD)</strong></td><td>Benefit</td><td><strong>43.6%</strong></td><td>Capacity Factor</td></tr>
+            <tr><td><strong>Substation Proximity</strong></td><td>Cost (Inverted)</td><td><strong>20.2%</strong></td><td>Line Losses</td></tr>
+            <tr><td><strong>Terrain Slope</strong></td><td>Cost (Inverted)</td><td><strong>18.6%</strong></td><td>Crane/Tower Transport</td></tr>
+            <tr><td><strong>Barren Wasteland</strong></td><td>Benefit</td><td><strong>17.6%</strong></td><td>Buffer Setbacks</td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:12px;color:var(--text-mute);">
+          $\lambda_{\max} = 4.0155$, $\text{CI} = 0.0052$, $\text{RI} = 0.90 \implies \mathbf{CR = 0.0057}$ (Mathematically Consistent)
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <strong>Min-Max Factor Normalization:</strong>
+        <span style="font-family:monospace;color:var(--wind-cyan);margin-left:8px;">$x_{norm} = \frac{x - x_{\min}}{x_{\max} - x_{\min}}$ (Benefit) &bull; $x_{norm} = \frac{x_{\max} - x}{x_{\max} - x_{\min}}$ (Cost)</span>
+      </div>
+      <div class="badge badge-emerald">Composite Score $\in [0, 100]$</div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 5 ==================== -->
+  <section class="slide" id="slide-5" data-cue="Results: Present top candidates. Ahilyanagar and Solapur dominate Solar. Sangli, Ahilyanagar, and Satara dominate Wind. The breakthrough finding: Ahilyanagar and Solapur rank in the Top 3 for both, identifying them as prime candidates for shared-grid co-located hybrid renewable parks.">
+    <div class="slide-tag">⏱️ 3:15 - 4:00 &bull; Slide 5 of 6</div>
+    <h1 class="slide-title">Real Siting Results & Top Ranked Candidates</h1>
+    <p class="slide-sub">Empirical district rankings across Maharashtra identifying prime standalone and co-located hybrid renewable hubs.</p>
+
+    <div class="grid-2">
+      <!-- Top Solar -->
+      <div class="card">
+        <h3 style="color:var(--solar-gold);font-size:16px;margin-bottom:10px;">☀️ Top 5 Solar Siting Districts</h3>
+        <table class="slide-table">
+          <thead><tr><th>Rank</th><th>District</th><th>Score</th><th>GHI (kWh/m²)</th><th>Land</th><th>Grid</th><th>Stability</th></tr></thead>
+          <tbody>
+            <tr style="font-weight:bold;color:#fef08a;"><td>#1</td><td>Ahilyanagar</td><td>89.3</td><td>5.39</td><td>25%</td><td>10 km</td><td>100%</td></tr>
+            <tr><td>#2</td><td>Solapur</td><td>81.6</td><td>5.29</td><td>30%</td><td>12 km</td><td>100%</td></tr>
+            <tr><td>#3</td><td>Pune</td><td>81.3</td><td>5.41</td><td>12%</td><td>6 km</td><td>100%</td></tr>
+            <tr><td>#4</td><td>Beed</td><td>80.4</td><td>5.32</td><td>28%</td><td>16 km</td><td>100%</td></tr>
+            <tr><td>#5</td><td>Dharashiv</td><td>77.4</td><td>5.31</td><td>27%</td><td>18 km</td><td>81.8%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Top Wind -->
+      <div class="card">
+        <h3 style="color:var(--wind-cyan);font-size:16px;margin-bottom:10px;">💨 Top 5 Wind Siting Districts</h3>
+        <table class="slide-table">
+          <thead><tr><th>Rank</th><th>District</th><th>Score</th><th>WPD (W/m²)</th><th>Slope</th><th>Existing</th><th>Stability</th></tr></thead>
+          <tbody>
+            <tr style="font-weight:bold;color:#a5f3fc;"><td>#1</td><td>Sangli</td><td>78.3</td><td>330</td><td>5.0°</td><td>480 MW</td><td>100%</td></tr>
+            <tr><td>#2</td><td>Ahilyanagar</td><td>76.4</td><td>280</td><td>4.0°</td><td>420 MW</td><td>100%</td></tr>
+            <tr><td>#3</td><td>Solapur</td><td>75.9</td><td>240</td><td>2.0°</td><td>110 MW</td><td>100%</td></tr>
+            <tr><td>#4</td><td>Satara</td><td>72.8</td><td>380</td><td>9.0°</td><td>950 MW</td><td>95.7%</td></tr>
+            <tr><td>#5</td><td>Dhule</td><td>68.6</td><td>290</td><td>6.0°</td><td>528 MW</td><td>67.6%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Strategic Hybrid Insight -->
+    <div class="card highlight" style="margin-top:16px;border-left:4px solid var(--hybrid-emerald);">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:24px;">💡</span>
+        <div>
+          <strong style="color:var(--hybrid-emerald);font-size:15px;">Strategic Discovery: Co-Located Hybrid Renewable Hubs</strong>
+          <p style="font-size:13px;color:var(--text-mute);margin-top:2px;">
+            <strong>Ahilyanagar (Score 82.8, Rank 1)</strong> and <strong>Solapur (Score 78.7, Rank 2)</strong> rank in the Top 3 for <em>both</em> solar and wind. Co-locating solar and wind at these sites allows developers to share costly high-voltage substation switchyards, smooth day/night intermittency, and increase evacuation transmission capacity factors by 35–45%.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 6 ==================== -->
+  <section class="slide" id="slide-6" data-cue="Validation & Limits: Strong empirical validation against ground-truth operational plants. Solar ROC AUC is 0.9028, Wind ROC AUC is 0.9524, and Spearman correlation is 0.83. Conclude with honest limitations: this is a macro-level district model; micro-siting requires cadastral village surveys and MahaTransco MVA headroom confirmation.">
+    <div class="slide-tag">⏱️ 4:00 - 5:00 &bull; Slide 6 of 6</div>
+    <h1 class="slide-title">Model Validation & Honest Engineering Limitations</h1>
+    <p class="slide-sub">Ground-truth validation against operational plants in Maharashtra and boundary conditions of the decision model.</p>
+
+    <div class="grid-2">
+      <!-- Validation Metrics -->
+      <div class="card">
+        <h3 style="color:var(--hybrid-emerald);font-size:16px;margin-bottom:12px;">🔬 Empirical Machine Learning Validation</h3>
+        <div class="grid-2" style="gap:12px;margin-bottom:12px;">
+          <div style="background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;text-align:center;">
+            <div style="font-size:24px;font-weight:800;color:var(--solar-gold);">0.9028</div>
+            <div style="font-size:11px;color:var(--text-mute);">Solar ROC AUC (AHP)</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;text-align:center;">
+            <div style="font-size:24px;font-weight:800;color:var(--wind-cyan);">0.9524</div>
+            <div style="font-size:11px;color:var(--text-mute);">Wind ROC AUC (AHP)</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;text-align:center;">
+            <div style="font-size:24px;font-weight:800;color:var(--solar-gold);">ρ = 0.829</div>
+            <div style="font-size:11px;color:var(--text-mute);">Solar Spearman ($p < 10^{-8}$)</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;text-align:center;">
+            <div style="font-size:24px;font-weight:800;color:var(--wind-cyan);">ρ = 0.763</div>
+            <div style="font-size:11px;color:var(--text-mute);">Wind Spearman ($p < 10^{-6}$)</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-mute);line-height:1.4;">
+          Validated with Random Forest Leave-One-Out Cross-Validation (LOOCV) against operational plants in Maharashtra.
+        </div>
+      </div>
+
+      <!-- Limitations -->
+      <div class="card">
+        <h3 style="color:var(--danger-red);font-size:16px;margin-bottom:12px;">⚠️ Honest Technical Limitations</h3>
+        <ul style="font-size:12.5px;color:var(--text-mute);line-height:1.55;margin-left:18px;">
+          <li style="margin-bottom:8px;">
+            <strong>Macro vs Parcel Siting:</strong> Model evaluates district and taluka macro-suitability; actual micro-siting requires cadastral village land surveys for exact parcel shapes.
+          </li>
+          <li style="margin-bottom:8px;">
+            <strong>Substation Headroom:</strong> Model measures physical distance to substations; actual spare MVA transformer capacity must be verified with MahaTransco.
+          </li>
+          <li style="margin-bottom:8px;">
+            <strong>Dynamic Dust / Soiling:</strong> Agricultural harvesting seasons introduce temporary dust deposition on modules requiring local wash schedules.
+          </li>
+          <li>
+            <strong>Land Title & Forest Clearances:</strong> Actual procurement depends on local revenue land records and non-forest demarcation.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Conclusion Banner -->
+    <div style="margin-top:16px;text-align:center;padding:12px;background:rgba(59, 130, 246, 0.1);border:1px solid rgba(59, 130, 246, 0.3);border-radius:10px;">
+      <strong style="color:var(--text-main);font-size:14px;">Ready for Evaluation & Live Demonstration</strong>
+      <span style="color:var(--text-mute);font-size:13px;margin-left:12px;">Open the interactive GIS dashboard below to explore any of Maharashtra's 34 districts in real time.</span>
+    </div>
+  </section>
+
+</main>
+
+<!-- Speaker Cue Card Overlay -->
+<div class="cue-card" id="cue-box">
+  <h4>
+    <span>🎙️ Presenter Cue Track</span>
+    <button id="close-cue" style="background:none;border:none;color:#fff;cursor:pointer;font-size:14px;">✕</button>
+  </h4>
+  <p id="cue-text"></p>
+</div>
+
+<!-- Bottom Control Bar -->
+<footer id="controls">
+  <div class="ctrl-group">
+    <a href="index.html" class="btn" title="Open Interactive Dashboard">🗺️ Live Dashboard</a>
+    <a href="docs/" class="btn" title="Open Technical Docs">📚 Tech Docs</a>
+    <button class="btn" id="cue-toggle" title="Toggle Presenter Cue Card (P)">🎙️ Cue Notes [P]</button>
+  </div>
+
+  <div class="ctrl-group">
+    <div class="slide-dots" id="dots-container"></div>
+    <span style="font-size:13px;color:var(--text-mute);font-variant-numeric:tabular-nums;" id="slide-num">1 / 6</span>
+  </div>
+
+  <div class="ctrl-group">
+    <div class="timer-box" title="5-Minute Presentation Countdown Timer">
+      <div class="timer-dot" id="timer-dot"></div>
+      <span id="timer-display">05:00</span>
+      <button id="timer-btn" style="background:none;border:none;color:var(--text-mute);cursor:pointer;font-size:12px;padding:2px 4px;">▶</button>
+      <button id="timer-reset" style="background:none;border:none;color:var(--text-mute);cursor:pointer;font-size:12px;padding:2px 4px;">↺</button>
+    </div>
+
+    <button class="btn" id="prev-btn" title="Previous Slide (Left Arrow)">◀</button>
+    <button class="btn btn-primary" id="next-btn" title="Next Slide (Right Arrow / Space)">Next ▶</button>
+    <button class="btn" id="fs-btn" title="Toggle Fullscreen (F)">⛶</button>
+  </div>
+</footer>
+
+<script>
+let currentSlide = 1;
+const totalSlides = 6;
+const slides = document.querySelectorAll(".slide");
+const dotsContainer = document.getElementById("dots-container");
+const progressBar = document.getElementById("progress-bar");
+const slideNum = document.getElementById("slide-num");
+const cueBox = document.getElementById("cue-box");
+const cueText = document.getElementById("cue-text");
+
+// Build dots
+for (let i = 1; i <= totalSlides; i++) {
+  const dot = document.createElement("div");
+  dot.className = "dot" + (i === 1 ? " active" : "");
+  dot.onclick = () => goToSlide(i);
+  dotsContainer.appendChild(dot);
+}
+const dots = document.querySelectorAll(".dot");
+
+function updateCue() {
+  const activeSlide = document.getElementById("slide-" + currentSlide);
+  cueText.textContent = activeSlide.dataset.cue || "No cue available.";
+}
+
+function goToSlide(n) {
+  if (n < 1 || n > totalSlides) return;
+  currentSlide = n;
+  slides.forEach((s, idx) => s.classList.toggle("active", idx === n - 1));
+  dots.forEach((d, idx) => d.classList.toggle("active", idx === n - 1));
+  progressBar.style.width = ((n / totalSlides) * 100) + "%";
+  slideNum.textContent = n + " / " + totalSlides;
+  updateCue();
+}
+
+document.getElementById("prev-btn").onclick = () => goToSlide(currentSlide - 1);
+document.getElementById("next-btn").onclick = () => goToSlide(currentSlide + 1);
+
+document.getElementById("cue-toggle").onclick = () => {
+  cueBox.classList.toggle("visible");
+};
+document.getElementById("close-cue").onclick = () => {
+  cueBox.classList.remove("visible");
+};
+
+// Fullscreen
+document.getElementById("fs-btn").onclick = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+};
+
+// Keyboard navigation
+window.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+    goToSlide(currentSlide + 1);
+  } else if (e.key === "ArrowLeft" || e.key === "PageUp" || e.key === "Backspace") {
+    goToSlide(currentSlide - 1);
+  } else if (e.key === "Home") {
+    goToSlide(1);
+  } else if (e.key === "End") {
+    goToSlide(totalSlides);
+  } else if (e.key >= "1" && e.key <= "6") {
+    goToSlide(parseInt(e.key));
+  } else if (e.key.toLowerCase() === "p") {
+    cueBox.classList.toggle("visible");
+  } else if (e.key.toLowerCase() === "f") {
+    document.getElementById("fs-btn").click();
+  } else if (e.key.toLowerCase() === "d") {
+    window.location.href = "index.html";
+  }
+});
+
+/* 5-Minute Timer */
+let timeLeft = 300; // 5 minutes in seconds
+let timerInterval = null;
+const timerDisplay = document.getElementById("timer-display");
+const timerDot = document.getElementById("timer-dot");
+const timerBtn = document.getElementById("timer-btn");
+const timerReset = document.getElementById("timer-reset");
+
+function updateTimerDisplay() {
+  const m = Math.floor(timeLeft / 60);
+  const s = timeLeft % 60;
+  timerDisplay.textContent = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+
+  if (timeLeft <= 60) {
+    timerDot.className = "timer-dot danger";
+  } else if (timeLeft <= 120) {
+    timerDot.className = "timer-dot warning";
+  } else {
+    timerDot.className = "timer-dot";
+  }
+}
+
+function startTimer() {
+  if (timerInterval) return;
+  timerBtn.textContent = "⏸";
+  timerInterval = setInterval(() => {
+    if (timeLeft > 0) {
+      timeLeft--;
+      updateTimerDisplay();
+    } else {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerBtn.textContent = "▶";
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    timerBtn.textContent = "▶";
+  }
+}
+
+timerBtn.onclick = () => {
+  if (timerInterval) pauseTimer();
+  else startTimer();
+};
+
+timerReset.onclick = () => {
+  pauseTimer();
+  timeLeft = 300;
+  updateTimerDisplay();
+};
+
+// Initial boot
+updateCue();
+updateTimerDisplay();
+</script>
+</body>
+</html>

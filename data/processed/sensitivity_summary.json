@@ -1,0 +1,64 @@
+{
+  "n_monte_carlo_trials": 1000,
+  "weight_perturbation_pct": 20,
+  "solar_top5_rank_stability": {
+    "Ahilyanagar": {
+      "mean_rank": 1.0,
+      "rank_std": 0.0,
+      "top5_retention_prob_pct": 100.0
+    },
+    "Solapur": {
+      "mean_rank": 2.46,
+      "rank_std": 0.51,
+      "top5_retention_prob_pct": 100.0
+    },
+    "Pune": {
+      "mean_rank": 2.88,
+      "rank_std": 0.92,
+      "top5_retention_prob_pct": 100.0
+    },
+    "Beed": {
+      "mean_rank": 3.69,
+      "rank_std": 0.46,
+      "top5_retention_prob_pct": 100.0
+    },
+    "Dharashiv": {
+      "mean_rank": 5.18,
+      "rank_std": 0.51,
+      "top5_retention_prob_pct": 81.8
+    }
+  },
+  "wind_top5_rank_stability": {
+    "Sangli": {
+      "mean_rank": 1.11,
+      "rank_std": 0.36,
+      "top5_retention_prob_pct": 100.0
+    },
+    "Ahilyanagar": {
+      "mean_rank": 2.32,
+      "rank_std": 0.47,
+      "top5_retention_prob_pct": 100.0
+    },
+    "Solapur": {
+      "mean_rank": 2.82,
+      "rank_std": 0.86,
+      "top5_retention_prob_pct": 100.0
+    },
+    "Satara": {
+      "mean_rank": 3.86,
+      "rank_std": 0.73,
+      "top5_retention_prob_pct": 95.7
+    },
+    "Dhule": {
+      "mean_rank": 5.57,
+      "rank_std": 0.86,
+      "top5_retention_prob_pct": 67.6
+    }
+  },
+  "kmeans_silhouette_score": 0.3766,
+  "tier_breakdown": {
+    "Tier 2: Secondary / Grid-Targeted": 16,
+    "Tier 1: Prime Development Zone": 13,
+    "Tier 3: Ecologically / Resource Constrained": 5
+  }
+}

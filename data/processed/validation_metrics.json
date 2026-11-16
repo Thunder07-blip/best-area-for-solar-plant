@@ -1,0 +1,33 @@
+{
+  "sample_size": 34,
+  "solar_validation": {
+    "ground_truth_positives": 18,
+    "spearman_correlation": 0.8292,
+    "spearman_p_value": 1.3726e-09,
+    "pearson_r": 0.5934,
+    "ahp_score_roc_auc": 0.9028,
+    "rf_loocv_roc_auc": 0.8889,
+    "rf_pr_auc": 0.9098,
+    "feature_importances": {
+      "solar_ghi_kwh_m2_day": 0.1145,
+      "substation_dist_km": 0.2713,
+      "barren_land_pct": 0.3256,
+      "terrain_slope_deg": 0.2886
+    }
+  },
+  "wind_validation": {
+    "ground_truth_positives": 13,
+    "spearman_correlation": 0.7632,
+    "spearman_p_value": 1.5354e-07,
+    "pearson_r": 0.6099,
+    "ahp_score_roc_auc": 0.9524,
+    "rf_loocv_roc_auc": 0.9524,
+    "rf_pr_auc": 0.9351,
+    "feature_importances": {
+      "wind_power_density_w_m2": 0.6017,
+      "substation_dist_km": 0.1195,
+      "barren_land_pct": 0.2054,
+      "terrain_slope_deg": 0.0734
+    }
+  }
+}

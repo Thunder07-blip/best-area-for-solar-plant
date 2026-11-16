@@ -1,0 +1,48 @@
+# Incomplete / browser download files
+*.crdownload
+
+# Large raw datasets exceeding GitHub limit (>50MB / >100MB)
+# Note: Full raw dataset provenance and download sources are documented in data/raw/README.md
+India_GISdata_LTAym_YearlyMonthlyTotals_GlobalSolarAtlas-v2_GEOTIFF.zip
+humid_tele_hr_maharashtra-sw_mh_2024_2024.csv
+rainfall_tel_hr_maharashtra_sw_mh_2021_2025.csv
+humid_tele_hr_maharashtra-sw_mh_2022_2022.csv
+sunshine_duration_manual_hr_maharashtra-sw_mh_1991_2020.csv
+humid_tel_hr_maharashtra_sw_mh_2025_2025.csv
+humid_tel_hr_maharashtra_sw_mh_2026_2030.csv
+wind_speed_tel_hr_maharashtra_sw_mh_2026_2030.csv
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Temporary & test files
+test_*.txt
+*.tmp
+
+# Local agent & editor metadata
+.agents/
+.claude/
+.codex/
+.termic/
+.vscode/
+.idea/

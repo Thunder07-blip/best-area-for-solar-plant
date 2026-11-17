@@ -18,7 +18,7 @@ Routes:
 import os
 import json
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -114,6 +114,28 @@ async def get_talukas():
         df = pd.read_csv(taluka_path)
         return df.to_dict(orient="records")
     raise HTTPException(status_code=404, detail="taluka_features.csv not found")
+
+
+@app.get("/api/taluka-boundaries", summary="Simplified taluka boundary polygons for map rendering")
+async def get_taluka_boundaries(district: str = Query(..., min_length=1, max_length=80)):
+    """Return only one district's simplified local boundary features."""
+    boundary_path = os.path.join(BASE_DIR, "data", "boundaries", "maharashtra_talukas_simplified.geojson")
+    if not os.path.exists(boundary_path):
+        raise HTTPException(status_code=404, detail="Taluka boundary data not found")
+    with open(boundary_path, "r", encoding="utf-8") as f:
+        collection = json.load(f)
+
+    aliases = {
+        "chh sambhajinagar": "chhatrapati sambhajinagar",
+        "chh. sambhajinagar": "chhatrapati sambhajinagar",
+    }
+    requested = " ".join(district.casefold().replace(".", "").split())
+    requested = aliases.get(requested, requested)
+    features = [feature for feature in collection["features"]
+                if " ".join(feature["properties"].get("district", "").casefold().split()) == requested]
+    if not features:
+        raise HTTPException(status_code=404, detail=f"No taluka boundaries found for {district}")
+    return {"type": "FeatureCollection", "features": features}
 
 
 @app.get("/api/validation", summary="Machine Learning Validation Metrics")

@@ -46,6 +46,12 @@ Raw Datasets (GeoTIFF Rasters, WRIS Telemetry CSVs, Grid Substation & Wasteland 
 
 ---
 
+### Taluka Map Boundaries
+
+The district drill-down draws simplified taluka boundary polygons and clickable score pins using native SVG. It loads only the selected district from `data/boundaries/maharashtra_talukas_simplified.geojson` through `/api/taluka-boundaries`; the complete local dataset is under 1 MB. The source boundaries are credited to [Rahul Gawai?s Maharashtra NDVI Explorer](https://github.com/rahulwebgis/maharashtra-ndvi-explorer), which documents conversion from Maharashtra district and taluka layers.
+
+---
+
 ## 2. Key Findings & Ranked Siting Candidates
 
 ### Top 5 Solar Siting Districts

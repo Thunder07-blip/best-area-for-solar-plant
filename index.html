@@ -237,6 +237,152 @@ svg#map {
   text-shadow: 0 2px 4px rgba(0,0,0,0.9);
 }
 
+/* Taluka Map Polygons & Navigation */
+.cartogram-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0 14px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+}
+.cartogram-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-sub);
+}
+.btn-back-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f8fafc;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-back-state:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: #fff;
+  transform: translateX(-2px);
+}
+.level-toggles {
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 3px;
+  gap: 3px;
+}
+.level-btn {
+  background: transparent;
+  border: 0;
+  color: var(--text-mute);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.level-btn.active {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+.district-quick-select {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #f8fafc;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.district-quick-select:focus {
+  outline: 2px solid var(--solar-gold);
+}
+.taluka-tile {
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  stroke: rgba(255, 255, 255, 0.2);
+  stroke-width: 1.5;
+}
+.taluka-tile:hover {
+  stroke: #ffffff;
+  stroke-width: 3;
+  filter: brightness(1.22) drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+}
+.taluka-tile.sel {
+  stroke: #ffffff;
+  stroke-width: 4;
+  filter: brightness(1.35) drop-shadow(0 0 12px rgba(255,255,255,0.6));
+}
+.lbl-taluka-name {
+  font-weight: 800;
+  fill: #ffffff;
+  pointer-events: none;
+  text-anchor: middle;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+}
+.lbl-taluka-score {
+  font-weight: 900;
+  fill: #ffffff;
+  pointer-events: none;
+  text-anchor: middle;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+}
+.lbl-taluka-rank {
+  font-size: 10.5px;
+  font-weight: 600;
+  fill: #e2e8f0;
+  pointer-events: none;
+  text-anchor: middle;
+}
+.lbl-taluka-sub {
+  font-size: 9.5px;
+  font-weight: 500;
+  fill: rgba(255, 255, 255, 0.88);
+  pointer-events: none;
+  text-anchor: middle;
+}
+.taluka-mini-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+.taluka-mini-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.taluka-mini-item:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.25);
+  transform: translateY(-1px);
+}
+.taluka-mini-item.active {
+  border-color: #fff;
+  background: rgba(255,255,255,0.16);
+}
+
 /* Legend */
 .legend-bar {
   display: flex;
@@ -647,12 +793,31 @@ svg#map {
         <div class="card-header">
           <div>
             <h2 class="card-title" id="map-heading">Solar Suitability Heatmap</h2>
-            <p class="card-subtitle">Geographic tile matrix of 34 Maharashtra districts</p>
+            <p class="card-subtitle" id="map-subheading">Geographic tile matrix of 34 Maharashtra districts • Click any district to view its Taluka Map</p>
           </div>
           <div class="mode-toggles">
             <button class="mode-btn active" data-m="solar">☀️ Solar</button>
             <button class="mode-btn" data-m="wind">💨 Wind</button>
             <button class="mode-btn" data-m="hybrid">⚡ Hybrid</button>
+          </div>
+        </div>
+
+        <div id="cartogram-nav" class="cartogram-nav">
+          <div class="cartogram-breadcrumbs">
+            <button id="btn-back-state" class="btn-back-state" style="display:none;" onclick="setMapView('state')">
+              ← Back to Maharashtra (34 Districts)
+            </button>
+            <span id="breadcrumb-state" style="font-weight:600;color:#f8fafc;">🏛️ Maharashtra State (34 Districts)</span>
+            <span id="breadcrumb-sep" style="display:none;color:var(--text-mute);margin:0 4px;">›</span>
+            <span id="breadcrumb-district" style="display:none;font-weight:700;color:var(--solar-gold);"></span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div class="level-toggles">
+              <button id="btn-view-state" class="level-btn active" onclick="setMapView('state')">🏛️ 34 Districts</button>
+              <button id="btn-view-taluka" class="level-btn" onclick="setMapView('taluka')">📍 Taluka Map</button>
+            </div>
+            <select id="sel-district-taluka" class="district-quick-select" onchange="onDistrictDropdownChange(this.value)" aria-label="Select District"></select>
           </div>
         </div>
 
@@ -1196,6 +1361,39 @@ const DATA = [
   {"name":"Sindhudurg","col":0,"row":5,"lat":16.2324,"lon":73.8547,"solar_ghi":5.05,"solar_dni":1320.5,"solar_pvout":1505.9,"optimal_tilt":21,"wind_wpd":150,"wind_speed_100m":6.26,"substation_dist":28.0,"barren_pct":4.0,"slope":14.0,"rainfall":6399.0,"humidity":62.0,"exist_solar_mw":15,"exist_wind_mw":0,"solar_score":9.8,"solar_rank":34,"solar_tier":"Low","solar_stability":0.0,"wind_score":17.8,"wind_rank":33,"wind_tier":"Low","wind_stability":0.0,"hybrid_score":13.8,"hybrid_rank":34,"investment_tier":"Tier 3: Ecologically / Resource Constrained"}
 ];
 
+/* ========================================================= */
+/* COMPACT TALUKA DATASET (149 TALUKAS ACROSS 34 DISTRICTS) */
+/* ========================================================= */
+const RAW_TALUKAS = {"Ahilyanagar":{"c":3,"r":3,"t":[["Akole",0.0,0,19.5333,73.9333,5.35,280.0,18.0,15.0,8.0,59.6,55.7,57.7,9,9,9,96,72],["Sangamner",1.0,0,19.57,74.21,5.43,260.0,12.0,22.0,5.0,81.1,64.5,72.8,3,7,6,6,39],["Kopargaon",2.0,0,19.8833,74.4833,5.4,220.0,10.0,18.0,3.0,78.3,60.8,69.5,6,8,8,14,56],["Parner",0.0,1,19.0028,74.4378,5.36,310.0,8.0,32.0,4.0,81.2,80.5,80.8,2,2,1,5,3],["Rahuri",1.0,1,19.39,74.65,5.4,240.0,10.0,24.0,3.0,81.9,67.0,74.4,1,6,4,3,33],["Shevgaon",2.0,1,19.35,75.2167,5.37,250.0,12.0,26.0,3.0,78.1,68.6,73.4,7,5,5,15,28],["Supa",0.0,2,18.9167,74.5,5.34,330.0,6.0,30.0,4.0,78.4,82.9,80.6,5,1,2,13,1],["Shrigonda",1.0,2,18.6167,74.6833,5.37,270.0,11.0,28.0,3.0,79.8,72.9,76.4,4,4,3,10,15],["Karjat",2.0,2,18.9167,75.0167,5.3,280.0,14.0,30.0,3.0,70.3,74.1,72.2,8,3,7,43,12]]},"Akola":{"c":3,"r":1,"t":[["Balapur",0.0,0,20.6667,76.7833,5.33,140.0,14.0,13.0,2.0,65.2,46.9,56.0,1,3,2,73,98],["Barshitakli",1.0,0,20.5833,77.0667,5.32,140.0,15.0,14.0,2.0,64.0,47.0,55.5,3,2,3,80,97],["Murtijapur",2.0,0,20.7333,77.3667,5.31,150.0,12.0,15.0,2.0,64.8,50.3,57.5,2,1,1,74,86]]},"Amravati":{"c":2,"r":2,"t":[["Dharni",0.0,0,21.5833,76.8833,5.22,130.0,28.0,8.0,7.0,34.4,28.4,31.4,4,4,4,137,140],["Morshi",1.0,0,21.3167,78.0167,5.23,130.0,16.0,10.0,3.0,48.0,41.3,44.6,3,2,3,124,117],["Achalpur",0.0,1,21.25,77.5167,5.28,140.0,14.0,11.0,3.0,56.2,44.1,50.2,1,1,1,107,105],["Chandur Bazar",1.0,1,21.2333,77.75,5.27,130.0,16.0,9.0,3.0,52.6,40.7,46.7,2,3,2,115,122]]},"Beed":{"c":4,"r":2,"t":[["Patoda",0.0,0,18.9,75.4333,5.32,230.0,16.0,28.0,4.0,69.5,63.7,66.6,6,4,7,46,44],["Georai",1.0,0,19.2667,75.75,5.35,220.0,16.0,26.0,3.0,73.4,62.8,68.1,2,6,3,24,49],["Majalgaon",2.0,0,19.15,76.2167,5.37,210.0,18.0,25.0,2.0,75.7,61.5,68.6,1,7,2,17,55],["Parli",3.0,0,18.85,76.5333,5.33,220.0,12.0,24.0,3.0,71.6,63.4,67.5,3,5,5,34,45],["Ashti",0.5,1,18.8,75.1667,5.27,240.0,14.0,30.0,3.0,66.3,68.7,67.5,7,1,5,66,25],["Kaij",1.5,1,18.7,76.0167,5.3,230.0,15.0,32.0,3.0,71.0,68.1,69.5,5,2,1,37,29],["Ambejogai",2.5,1,18.7333,76.3833,5.32,220.0,14.0,27.0,3.0,71.1,64.3,67.7,4,3,4,36,40]]},"Bhandara":{"c":3,"r":1,"t":[["Pauni",0.0,0,20.7833,79.6333,5.27,105.0,16.0,7.0,3.0,51.4,36.2,43.8,2,1,1,120,129],["Tumsar",1.0,0,21.3833,79.7333,5.28,100.0,16.0,6.0,3.0,52.1,34.9,43.5,1,2,2,118,132],["Sakoli",2.0,0,21.0833,79.9833,5.27,95.0,18.0,6.0,3.0,49.8,33.3,41.6,3,3,3,122,133]]},"Buldhana":{"c":2,"r":2,"t":[["Malkapur",0.0,0,20.8833,76.2,5.32,160.0,16.0,18.0,3.0,64.7,50.0,57.3,3,1,2,76,88],["Shegaon",1.0,0,20.7833,76.6833,5.33,150.0,16.0,17.0,2.0,66.6,49.6,58.1,2,2,1,64,90],["Khamgaon",0.0,1,20.6833,76.5667,5.35,150.0,18.0,17.0,3.0,67.0,47.2,57.1,1,3,3,58,96],["Mehkar",1.0,1,20.15,76.5667,5.32,150.0,20.0,18.0,3.0,62.6,46.8,54.7,4,4,4,84,99]]},"Chandrapur":{"c":3,"r":1,"t":[["Warora",0.0,0,20.2333,79.0,5.25,110.0,10.0,9.0,3.0,53.1,40.8,46.9,2,2,2,111,121],["Bhadravati",1.0,0,20.1,79.1167,5.27,110.0,10.0,9.0,2.0,56.9,42.3,49.6,1,1,1,104,111],["Rajura",2.0,0,19.7833,79.3667,5.25,100.0,16.0,8.0,3.0,49.4,36.1,42.8,3,3,3,123,130]]},"Chh. Sambhajinagar":{"c":3,"r":2,"t":[["Vaijapur",0.0,0,19.9333,74.7333,5.35,210.0,12.0,22.0,4.0,71.8,59.4,65.6,3,3,3,33,61],["Kannad",1.0,0,20.2667,75.1333,5.35,190.0,15.0,18.0,5.0,66.7,51.4,59.0,5,5,5,63,82],["Sillod",2.0,0,20.3,75.65,5.34,190.0,14.0,18.0,4.0,67.1,53.4,60.2,4,4,4,57,75],["Gangapur",0.5,1,19.7,75.0167,5.35,210.0,10.0,24.0,3.0,75.3,63.0,69.1,2,1,2,20,47],["Paithan",1.5,1,19.4833,75.3833,5.43,200.0,10.0,22.0,3.0,84.6,60.5,72.6,1,2,1,1,58]]},"Dharashiv":{"c":3,"r":2,"t":[["Paranda",0.0,0,18.55,75.45,5.24,240.0,16.0,30.0,2.0,62.6,69.3,66.0,6,1,3,84,21],["Bhum",1.0,0,18.7833,75.6667,5.32,230.0,20.0,26.0,4.0,66.2,60.7,63.5,4,6,6,68,57],["Kalamb",2.0,0,18.45,76.05,5.3,220.0,18.0,26.0,3.0,65.8,61.8,63.8,5,5,5,69,53],["Dharashiv",0.0,1,18.1856,76.0419,5.31,240.0,14.0,28.0,3.0,70.4,67.5,69.0,1,2,1,41,31],["Tuljapur",1.0,1,18.0,76.0833,5.3,240.0,16.0,29.0,3.0,68.7,67.2,67.9,2,3,2,53,32],["Omerga",2.0,1,17.8333,76.6167,5.29,230.0,18.0,27.0,2.0,66.3,65.3,65.8,3,4,4,66,37]]},"Dhule":{"c":2,"r":2,"t":[["Shindkheda",0.0,0,21.2667,74.75,5.31,290.0,14.0,22.0,4.0,65.5,69.2,67.4,3,3,3,72,22],["Shirpur",1.0,0,21.35,74.8833,5.33,270.0,16.0,20.0,5.0,64.7,62.8,63.8,4,4,4,76,49],["Sakri",0.0,1,20.9833,74.3167,5.4,320.0,12.0,26.0,5.0,79.6,74.9,77.3,1,1,1,11,8],["Dhule",1.0,1,20.9042,74.7749,5.34,290.0,10.0,20.0,4.0,70.3,69.8,70.1,2,2,2,43,19]]},"Gadchiroli":{"c":3,"r":1,"t":[["Chamorshi",0.0,0,19.9333,79.9,5.28,90.0,40.0,4.0,5.0,36.3,18.3,27.3,2,2,2,135,148],["Armori",1.0,0,20.4667,79.9833,5.26,95.0,35.0,5.0,4.0,38.0,23.4,30.7,1,1,1,133,145],["Aheri",2.0,0,19.4167,80.0,5.23,85.0,48.0,4.0,6.0,24.4,12.4,18.4,3,3,3,144,149]]},"Gondia":{"c":3,"r":1,"t":[["Tirora",0.0,0,21.4167,79.9333,5.28,100.0,20.0,6.0,3.0,50.1,33.1,41.6,1,1,1,121,134],["Goregaon",1.0,0,21.3333,80.2167,5.27,95.0,24.0,5.0,4.0,44.9,28.4,36.7,2,2,2,126,140],["Amgaon",2.0,0,21.3667,80.3833,5.27,90.0,26.0,5.0,4.0,43.9,26.9,35.4,3,3,3,127,143]]},"Hingoli":{"c":3,"r":1,"t":[["Hingoli",0.0,0,19.7173,77.1472,5.31,150.0,18.0,20.0,3.0,63.5,48.9,56.2,1,2,1,82,91],["Basmath",1.0,0,19.3167,77.1667,5.33,150.0,22.0,19.0,3.0,63.5,46.5,55.0,1,3,3,82,100],["Kalamnuri",2.0,0,19.6667,77.3,5.3,160.0,20.0,21.0,3.0,61.8,49.9,55.9,3,1,2,88,89]]},"Jalgaon":{"c":3,"r":2,"t":[["Amalner",0.0,0,21.05,75.0667,5.3,170.0,12.0,14.0,3.0,61.6,50.8,56.2,4,4,4,89,85],["Jamner",1.0,0,20.8167,75.7833,5.33,180.0,12.0,16.0,3.0,66.8,53.4,60.1,3,2,3,61,75],["Raver",2.0,0,21.25,75.9667,5.3,160.0,14.0,12.0,4.0,58.2,45.9,52.0,5,5,5,101,101],["Chalisgaon",0.5,1,20.4667,75.0167,5.34,190.0,10.0,18.0,3.0,70.3,56.8,63.6,1,1,1,43,69],["Bhadgaon",1.5,1,20.6667,75.2333,5.34,180.0,12.0,16.0,3.0,68.1,53.4,60.7,2,2,2,54,75]]},"Jalna":{"c":2,"r":2,"t":[["Bhokardan",0.0,0,20.25,75.7667,5.33,180.0,15.0,18.0,3.0,66.5,53.2,59.8,4,4,4,65,78],["Ambad",1.0,0,19.6167,75.8,5.34,190.0,12.0,24.0,3.0,72.9,59.4,66.2,1,1,1,28,61],["Ghansawangi",0.0,1,19.5333,75.9833,5.34,180.0,14.0,23.0,2.0,72.6,58.1,65.3,2,2,2,29,66],["Partur",1.0,1,19.6,76.2167,5.31,190.0,14.0,22.0,3.0,66.8,57.3,62.0,3,3,3,61,68]]},"Kolhapur":{"c":2,"r":2,"t":[["Panhala",0.0,0,16.8167,74.1167,5.29,330.0,10.0,12.0,8.0,54.0,64.3,59.1,3,3,3,109,40],["Hatkanangle",1.0,0,16.75,74.45,5.37,300.0,8.0,12.0,5.0,69.2,65.9,67.5,1,1,1,48,36],["Radhanagari",0.0,1,16.4167,73.9833,5.23,340.0,14.0,10.0,10.0,40.4,59.5,49.9,4,4,4,129,60],["Kagal",1.0,1,16.5833,74.3167,5.37,310.0,10.0,12.0,6.0,67.0,64.7,65.9,2,2,2,58,38]]},"Latur":{"c":2,"r":2,"t":[["Chakur",0.0,0,18.7333,76.9333,5.3,190.0,16.0,22.0,2.0,65.7,57.9,61.8,4,4,4,70,67],["Udgir",1.0,0,18.3833,77.1167,5.34,200.0,16.0,24.0,2.0,72.1,60.5,66.3,1,3,2,30,58],["Ausa",0.0,1,18.25,76.5,5.31,210.0,14.0,26.0,2.0,70.4,63.9,67.2,2,1,1,41,43],["Nilanga",1.0,1,18.1333,76.7667,5.3,210.0,15.0,25.0,2.0,68.0,62.8,65.4,3,2,3,55,49]]},"Nagpur":{"c":2,"r":2,"t":[["Saoner",0.0,0,21.3833,78.9167,5.25,120.0,10.0,8.0,3.0,52.5,41.5,47.0,4,2,3,116,116],["Ramtek",1.0,0,21.4,79.3333,5.26,115.0,12.0,8.0,3.0,52.8,39.9,46.4,3,4,4,114,125],["Katol",0.0,1,21.2667,78.5833,5.26,120.0,12.0,9.0,3.0,53.4,41.2,47.3,2,3,2,110,118],["Umred",1.0,1,20.85,79.3333,5.27,125.0,10.0,10.0,2.0,57.5,44.9,51.2,1,1,1,103,102]]},"Nanded":{"c":2,"r":2,"t":[["Hadgaon",0.0,0,19.5,77.6667,5.31,150.0,22.0,16.0,3.0,59.1,44.7,51.9,4,4,4,98,104],["Biloli",1.0,0,18.7833,77.7333,5.31,160.0,18.0,19.0,2.0,64.2,51.2,57.7,1,1,1,78,83],["Mukhed",0.0,1,18.7,77.3667,5.3,160.0,20.0,18.0,3.0,60.0,48.2,54.1,2,2,2,93,94],["Deglur",1.0,1,18.55,77.5833,5.29,150.0,20.0,17.0,2.0,59.3,47.8,53.5,3,3,3,97,95]]},"Nandurbar":{"c":2,"r":2,"t":[["Taloda",0.0,0,21.5667,74.2167,5.39,250.0,24.0,16.0,7.0,63.7,51.0,57.4,3,3,3,81,84],["Shahada",1.0,0,21.55,74.4667,5.37,280.0,18.0,22.0,6.0,68.9,62.9,65.9,2,1,2,52,48],["Navapur",0.0,1,21.1667,73.8,5.32,260.0,22.0,16.0,9.0,53.0,50.2,51.6,4,4,4,113,87],["Nandurbar",1.0,1,21.3716,74.2409,5.4,270.0,14.0,20.0,6.0,73.7,62.2,68.0,1,2,1,22,52]]},"Nashik":{"c":3,"r":2,"t":[["Niphad",0.0,0,20.0833,74.1167,5.4,210.0,10.0,14.0,4.0,74.6,55.6,65.1,2,4,4,21,73],["Baglan",1.0,0,20.7833,74.15,5.38,210.0,15.0,14.0,7.0,65.7,48.6,57.2,5,5,5,70,92],["Malegaon",2.0,0,20.55,74.5333,5.37,220.0,10.0,18.0,4.0,73.1,59.3,66.2,4,1,2,26,63],["Igatpuri",0.0,1,19.7,73.5667,5.16,200.0,12.0,10.0,10.0,32.2,41.7,36.9,6,6,6,139,115],["Sinnar",1.0,1,19.85,74.0,5.46,230.0,8.0,16.0,5.0,83.5,58.8,71.2,1,2,1,2,64],["Yeola",2.0,1,20.0333,74.4833,5.38,220.0,12.0,18.0,4.0,73.4,58.4,65.9,3,3,3,24,65]]},"Palghar":{"c":3,"r":1,"t":[["Dahanu",0.0,0,19.9667,72.7333,5.33,190.0,12.0,7.0,7.0,56.4,43.2,49.8,1,1,1,106,109],["Palghar",1.0,0,19.6967,72.7699,5.3,180.0,10.0,6.0,8.0,51.7,40.7,46.2,2,2,2,119,122],["Jawhar",2.0,0,19.9167,73.2333,5.23,170.0,18.0,6.0,10.0,35.9,32.5,34.2,3,3,3,136,135]]},"Parbhani":{"c":3,"r":1,"t":[["Pathri",0.0,0,19.25,76.4167,5.34,170.0,16.0,22.0,2.0,70.9,55.3,63.1,1,3,1,38,74],["Jintur",1.0,0,19.6167,76.6833,5.31,180.0,16.0,24.0,3.0,67.0,56.2,61.6,3,2,3,58,71],["Gangakhed",2.0,0,18.95,76.75,5.32,170.0,15.0,23.0,2.0,69.4,56.3,62.9,2,1,2,47,70]]},"Pune":{"c":4,"r":2,"t":[["Haveli",0.0,0,18.5204,73.8567,5.31,210.0,4.0,8.0,6.0,59.7,51.7,55.7,7,5,7,94,80],["Junnar",1.0,0,19.2,73.88,5.38,220.0,12.0,12.0,8.0,64.8,48.6,56.7,5,7,6,74,92],["Khed",2.0,0,18.85,73.9167,5.35,230.0,9.0,10.0,7.0,62.4,51.7,57.1,6,5,5,86,80],["Shirur",3.0,0,18.8278,74.375,5.36,240.0,7.0,15.0,4.0,71.5,61.6,66.5,4,4,4,35,54],["Baramati",0.5,1,18.15,74.58,5.42,240.0,6.0,16.0,3.0,81.7,64.2,72.9,1,2,2,4,42],["Daund",1.5,1,18.4667,74.6,5.4,230.0,8.0,18.0,3.0,79.3,63.1,71.2,3,3,3,12,46],["Indapur",2.5,1,18.1167,75.0333,5.38,250.0,8.0,22.0,2.0,80.3,69.7,75.0,2,1,1,9,20]]},"Raigad":{"c":2,"r":2,"t":[["Pen",0.0,0,18.7333,73.1,5.17,160.0,8.0,5.0,10.0,32.5,35.2,33.9,2,2,2,138,131],["Panvel",1.0,0,18.9894,73.1175,5.2,170.0,6.0,5.0,9.0,38.7,39.0,38.9,1,1,1,131,126],["Roha",0.0,1,18.4333,73.1167,5.16,160.0,10.0,4.0,11.0,28.3,32.2,30.2,3,3,3,141,137],["Mahad",1.0,1,18.0833,73.4167,5.12,150.0,14.0,4.0,12.0,19.8,27.4,23.6,4,4,4,148,142]]},"Ratnagiri":{"c":2,"r":2,"t":[["Khed",0.0,0,17.7167,73.3833,5.13,190.0,16.0,5.0,12.0,20.7,32.5,26.6,4,2,4,147,135],["Chiplun",1.0,0,17.5333,73.5167,5.13,200.0,14.0,6.0,11.0,23.5,36.9,30.2,3,1,2,145,127],["Guhagar",0.0,1,17.4833,73.2,5.27,180.0,18.0,4.0,12.0,37.5,29.6,33.6,1,3,1,134,138],["Rajapur",1.0,1,16.65,73.5167,5.19,190.0,20.0,5.0,13.0,25.3,29.1,27.2,2,4,3,143,139]]},"Sangli":{"c":3,"r":2,"t":[["Khanapur",0.0,0,17.25,74.7167,5.36,330.0,14.0,22.0,5.0,70.9,73.0,71.9,4,4,4,38,14],["Atpadi",1.0,0,17.4167,74.95,5.35,330.0,15.0,25.0,4.0,72.1,75.8,74.0,3,3,3,30,7],["Jath",2.0,0,17.05,75.2167,5.36,360.0,12.0,26.0,4.0,75.6,81.8,78.7,1,1,1,19,2],["Tasgaon",0.0,1,17.0333,74.6,5.31,310.0,12.0,18.0,4.0,64.1,70.4,67.3,6,5,6,79,18],["Miraj",1.0,1,16.8333,74.65,5.34,290.0,8.0,14.0,3.0,69.0,68.8,68.9,5,6,5,50,24],["Kavathe Mahankal",2.0,1,17.0,74.8,5.35,340.0,12.0,24.0,4.0,73.0,78.0,75.5,2,2,2,27,4]]},"Satara":{"c":4,"r":2,"t":[["Wai",0.0,0,17.95,73.8833,5.27,320.0,16.0,10.0,12.0,42.1,52.8,47.5,7,7,7,128,79],["Khandala",1.0,0,18.05,74.0333,5.34,360.0,14.0,14.0,9.0,58.5,66.1,62.3,5,6,5,100,35],["Phaltan",2.0,0,17.9833,74.4333,5.37,350.0,12.0,16.0,4.0,70.8,74.6,72.7,1,2,1,40,9],["Man",3.0,0,17.7,74.5333,5.37,390.0,15.0,20.0,7.0,68.0,76.3,72.2,2,1,2,55,5],["Patan",0.5,1,17.3667,73.9,5.26,410.0,12.0,16.0,11.0,47.7,71.8,59.8,6,4,6,125,17],["Karad",1.5,1,17.2833,74.2,5.31,340.0,10.0,12.0,6.0,59.1,68.7,63.9,4,5,4,98,25],["Khatav",2.5,1,17.65,74.4,5.33,390.0,14.0,18.0,8.0,60.8,74.0,67.4,3,3,3,91,13]]},"Sindhudurg":{"c":3,"r":1,"t":[["Kudal",0.0,0,16.0,73.6833,5.22,150.0,24.0,4.0,13.0,26.6,21.3,24.0,1,2,1,142,146],["Kankavli",1.0,0,16.2667,73.7167,5.16,160.0,22.0,5.0,12.0,21.6,25.7,23.6,2,1,2,146,144],["Sawantwadi",2.0,0,15.9,73.8167,5.14,150.0,26.0,4.0,14.0,13.8,18.8,16.3,3,3,3,149,147]]},"Solapur":{"c":4,"r":2,"t":[["Malshiras",0.0,0,17.85,74.9667,5.39,240.0,15.0,27.0,2.0,81.1,68.0,74.5,1,7,5,6,30],["Karmala",1.0,0,18.4167,75.2,5.29,260.0,12.0,34.0,2.0,73.6,76.2,74.9,5,1,4,23,6],["Madha",2.0,0,18.0333,75.5167,5.28,250.0,10.0,32.0,2.0,72.1,74.6,73.4,6,2,6,30,9],["Barshi",3.0,0,18.2333,76.0,5.29,240.0,14.0,30.0,3.0,69.0,68.7,68.8,8,6,7,50,25],["Sangola",0.0,1,17.4333,75.2,5.34,250.0,12.0,30.0,2.0,77.8,72.5,75.2,3,4,1,16,16],["Pandharpur",1.0,1,17.6778,75.3278,5.37,230.0,11.0,28.0,2.0,81.1,69.1,75.1,1,5,2,6,23],["Mangalwedha",2.0,1,17.5167,75.45,5.31,250.0,12.0,33.0,2.0,75.7,74.3,75.0,4,3,3,17,11],["Akkalkot",3.0,1,17.5333,76.2,5.3,230.0,14.0,26.0,2.0,69.1,66.6,67.8,7,8,8,49,34]]},"Thane":{"c":3,"r":1,"t":[["Bhiwandi",0.0,0,19.3,73.0667,5.19,180.0,5.0,6.0,8.0,39.7,43.0,41.3,1,2,1,130,110],["Kalyan",1.0,0,19.2437,73.1355,5.17,175.0,4.0,5.0,7.0,38.2,43.7,41.0,2,1,2,132,107],["Murbad",2.0,0,19.25,73.4,5.16,170.0,10.0,7.0,10.0,31.4,36.8,34.1,3,3,3,140,128]]},"Wardha":{"c":3,"r":1,"t":[["Arvi",0.0,0,20.9833,78.2333,5.26,120.0,14.0,9.0,3.0,52.3,40.3,46.3,3,3,3,117,124],["Deoli",1.0,0,20.65,78.4833,5.28,115.0,14.0,9.0,2.0,56.2,41.2,48.7,2,2,2,107,118],["Hinganghat",2.0,0,20.55,78.8333,5.28,120.0,12.0,10.0,2.0,57.8,43.3,50.6,1,1,1,102,108]]},"Washim":{"c":3,"r":1,"t":[["Risod",0.0,0,19.9667,76.7833,5.31,140.0,22.0,17.0,3.0,59.7,44.0,51.8,3,2,2,94,106],["Malegaon_W",1.0,0,20.4,76.9667,5.32,140.0,20.0,17.0,3.0,62.0,44.9,53.5,1,1,1,87,102],["Mangrulpir",2.0,0,20.3167,77.35,5.33,135.0,22.0,15.0,3.0,61.1,42.1,51.6,2,3,3,90,112]]},"Yavatmal":{"c":3,"r":1,"t":[["Pusad",0.0,0,19.9,77.5667,5.29,130.0,18.0,15.0,4.0,56.6,41.8,49.2,2,1,2,105,113],["Umarkhed",1.0,0,19.6,77.7,5.32,130.0,20.0,14.0,3.0,60.2,41.8,51.0,1,1,1,92,113],["Wani",2.0,0,20.0667,78.95,5.26,120.0,16.0,12.0,3.0,53.1,41.1,47.1,3,3,3,111,120]]}};
+
+const TALUKA_DATA = {};
+for (const [dist, dObj] of Object.entries(RAW_TALUKAS)) {
+  TALUKA_DATA[dist] = {
+    cols: dObj.c,
+    rows: dObj.r,
+    items: dObj.t.map(t => ({
+      name: t[0],
+      col: t[1],
+      row: t[2],
+      lat: t[3],
+      lon: t[4],
+      solar_ghi: t[5],
+      wind_wpd: t[6],
+      substation_dist: t[7],
+      barren_pct: t[8],
+      slope: t[9],
+      solar_score: t[10],
+      wind_score: t[11],
+      hybrid_score: t[12],
+      dist_solar_rank: t[13],
+      dist_wind_rank: t[14],
+      dist_hybrid_rank: t[15],
+      state_solar_rank: t[16],
+      state_wind_rank: t[17]
+    }))
+  };
+}
+
 /* Normalization helpers */
 const colVals = key => DATA.map(d => d[key]);
 const minMax = arr => [Math.min(...arr), Math.max(...arr)];
@@ -1211,6 +1409,8 @@ const normC = (v, [mn, mx]) => (mx === mn ? 1 : (mx - v) / (mx - mn));
 
 let currentMode = "solar";
 let selectedIdx = 0; // Ahilyanagar default
+let currentView = "state"; // "state" or "taluka"
+let selectedTaluka = null; // null or taluka object
 
 /* Scientifically calculated AHP Presets */
 const AHP_PRESETS = {
@@ -1241,6 +1441,36 @@ function calculateScore(d) {
   return 100 * Object.keys(weights).reduce((s, k) => s + f[k] * weights[k], 0) / totalW;
 }
 
+function calculateTalukaScore(t) {
+  let resScore = 0;
+  if (currentMode === "solar") resScore = normB(t.solar_ghi, R.solar);
+  else if (currentMode === "wind") resScore = normB(t.wind_wpd, R.wind);
+  else resScore = 0.5 * normB(t.solar_ghi, R.solar) + 0.5 * normB(t.wind_wpd, R.wind);
+
+  const f = {
+    res: resScore,
+    grid: normC(t.substation_dist, R.grid),
+    land: normB(t.barren_pct, R.land),
+    terr: normC(t.slope, R.slope)
+  };
+  const totalW = Object.values(weights).reduce((a, b) => a + b, 0) || 1;
+  return 100 * Object.keys(weights).reduce((s, k) => s + f[k] * weights[k], 0) / totalW;
+}
+
+function calculateTalukaFactors(t) {
+  let resScore = 0;
+  if (currentMode === "solar") resScore = normB(t.solar_ghi, R.solar);
+  else if (currentMode === "wind") resScore = normB(t.wind_wpd, R.wind);
+  else resScore = 0.5 * normB(t.solar_ghi, R.solar) + 0.5 * normB(t.wind_wpd, R.wind);
+
+  return {
+    res: resScore,
+    grid: normC(t.substation_dist, R.grid),
+    land: normB(t.barren_pct, R.land),
+    terr: normC(t.slope, R.slope)
+  };
+}
+
 const colorRamps = {
   solar:  [[255, 247, 200], [245, 158, 11], [180, 50, 10]],
   wind:   [[225, 245, 254], [6, 182, 212],  [3, 70, 140]],
@@ -1259,45 +1489,200 @@ function interpolateColor(score) {
 const svg = document.getElementById("map");
 const S = 58, G = 8, PAD_X = 29, PAD_Y = 16;
 
-function renderStudio() {
-  const scores = DATA.map(calculateScore);
-  
-  // Render Map SVG
-  svg.innerHTML = DATA.map((d, i) => {
-    const x = d.col * (S + G) + PAD_X;
-    const y = d.row * (S + G) + PAD_Y;
-    const isSel = (i === selectedIdx);
-    const nm = d.name.replace("Chh. Sambhajinagar", "Sambhajinagar");
-    const sc = scores[i].toFixed(1);
-    const fill = interpolateColor(scores[i]);
+function setMapView(view, districtIdx = null, talukaName = null) {
+  if (districtIdx !== null && districtIdx >= 0 && districtIdx < DATA.length) {
+    selectedIdx = districtIdx;
+  }
+  currentView = view;
+  const dName = DATA[selectedIdx].name;
+  const tData = TALUKA_DATA[dName];
 
-    return `<g>
-      <rect class="tile${isSel ? ' sel' : ''}" data-i="${i}" x="${x}" y="${y}" width="${S}" height="${S}" rx="8" fill="${fill}" tabindex="0" role="button" aria-label="${d.name} score ${sc}"/>
-      <text class="lbl-name" x="${x + S/2}" y="${y + S/2 - 3}">${nm.length > 9 ? nm.slice(0, 8) + '…' : nm}</text>
-      <text class="lbl-score" x="${x + S/2}" y="${y + S/2 + 13}">${scores[i].toFixed(0)}</text>
+  if (view === "state") {
+    selectedTaluka = null;
+  } else if (talukaName && tData) {
+    selectedTaluka = tData.items.find(t => t.name === talukaName) || tData.items[0];
+  } else if (!selectedTaluka && tData && tData.items.length) {
+    selectedTaluka = tData.items[0];
+  }
+  renderStudio();
+}
+
+function onDistrictDropdownChange(val) {
+  const idx = DATA.findIndex(d => d.name === val);
+  if (idx !== -1) {
+    selectedIdx = idx;
+    selectedTaluka = null;
+    setMapView("taluka");
+  }
+}
+
+function initDistrictDropdown() {
+  const sel = document.getElementById("sel-district-taluka");
+  if (!sel) return;
+  sel.innerHTML = DATA.map((d, idx) => {
+    const tCount = (TALUKA_DATA[d.name] ? TALUKA_DATA[d.name].items.length : 0);
+    return `<option value="${d.name}"${idx === selectedIdx ? ' selected' : ''}>${d.name} (${tCount} Talukas)</option>`;
+  }).join("");
+}
+
+const TALUKA_BOUNDARY_CACHE = new Map();
+
+function projectBoundaryGeometry(geometry, project) {
+  const polygons = geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
+  return polygons.map(rings => rings.map(ring => ring.map(([lon, lat]) => project(lon, lat))));
+}
+
+function renderTalukaCartogram(d, scores) {
+  const tData = TALUKA_DATA[d.name];
+  if (!tData || !tData.items.length) {
+    svg.innerHTML = `<text x="355" y="210" fill="#ffffff" text-anchor="middle" font-size="16">No taluka map data available for ${d.name}</text>`;
+    return;
+  }
+  const boundaryDistrict = d.name === "Chh. Sambhajinagar" ? "Chhatrapati Sambhajinagar" : d.name;
+  if (TALUKA_BOUNDARY_CACHE.has(boundaryDistrict)) {
+    drawTalukaBoundaryMap(d, tData.items, TALUKA_BOUNDARY_CACHE.get(boundaryDistrict));
+    return;
+  }
+  svg.innerHTML = `<text x="355" y="210" fill="#cbd5e1" text-anchor="middle" font-size="15">Loading ${d.name} taluka map?</text>`;
+  fetch(`/api/taluka-boundaries?district=${encodeURIComponent(boundaryDistrict)}`)
+    .then(response => { if (!response.ok) throw new Error("Boundary request failed"); return response.json(); })
+    .then(collection => {
+      const features = collection.features || [];
+      TALUKA_BOUNDARY_CACHE.set(boundaryDistrict, features);
+      if (currentView === "taluka" && DATA[selectedIdx] === d) drawTalukaBoundaryMap(d, tData.items, features);
+    })
+    .catch(() => {
+      svg.innerHTML = `<text x="355" y="210" fill="#fca5a5" text-anchor="middle" font-size="14">Could not load the local boundary for ${d.name}</text>`;
+    });
+}
+
+function drawTalukaBoundaryMap(d, items, features) {
+  if (!features.length) return;
+  const coords = [];
+  for (const feature of features)
+    for (const polygon of projectBoundaryGeometry(feature.geometry, (lon, lat) => [lon, lat]))
+      for (const ring of polygon) coords.push(...ring);
+  const lons = coords.map(p => p[0]), lats = coords.map(p => p[1]);
+  const minLon = Math.min(...lons), maxLon = Math.max(...lons), minLat = Math.min(...lats), maxLat = Math.max(...lats);
+  const width = 710, height = 420, margin = 38;
+  const cosLat = Math.cos(((minLat + maxLat) / 2) * Math.PI / 180);
+  const geoW = Math.max((maxLon - minLon) * cosLat, 0.01), geoH = Math.max(maxLat - minLat, 0.01);
+  const scale = Math.min((width - 2 * margin) / geoW, (height - 2 * margin) / geoH);
+  const ox = (width - geoW * scale) / 2, oy = (height - geoH * scale) / 2;
+  const project = (lon, lat) => [ox + (lon - minLon) * cosLat * scale, height - oy - (lat - minLat) * scale];
+  const pathFor = geometry => projectBoundaryGeometry(geometry, project).map(poly => poly.map(ring =>
+    ring.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join("") + "Z"
+  ).join("")).join("");
+  const boundaries = features.map(feature => `<path d="${pathFor(feature.geometry)}" fill="rgba(96,165,250,.07)" stroke="rgba(191,219,254,.58)" stroke-width="1" vector-effect="non-scaling-stroke"/>`).join("");
+  const pins = items.filter(t => Number.isFinite(t.lat) && Number.isFinite(t.lon)).map(t => {
+    const [x, y] = project(t.lon, t.lat), score = calculateTalukaScore(t), fill = interpolateColor(score);
+    const active = selectedTaluka && selectedTaluka.name === t.name;
+    const rightEdge = x > width - 145, labelX = rightEdge ? x - 10 : x + 10, anchor = rightEdge ? "end" : "start";
+    return `<g class="taluka-pin${active ? " active" : ""}" data-taluka="${t.name}" tabindex="0" role="button" aria-label="${t.name} taluka score ${score.toFixed(1)}" style="cursor:pointer">
+      <title>${t.name}: ${score.toFixed(1)} / 100</title>
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${active ? 8 : 6}" fill="${fill}" stroke="#fff" stroke-width="2" vector-effect="non-scaling-stroke"/>
+      <text x="${labelX.toFixed(1)}" y="${(y - 9).toFixed(1)}" text-anchor="${anchor}" fill="#f8fafc" font-size="11" font-weight="700" paint-order="stroke" stroke="#0f172a" stroke-width="3" stroke-linejoin="round">${t.name} ? ${score.toFixed(0)}</text>
     </g>`;
   }).join("");
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.innerHTML = `<g aria-label="${d.name} district taluka boundaries">${boundaries}</g>${pins}`;
+}
+
+function renderStudio() {
+  const scores = DATA.map(calculateScore);
+  const currentDist = DATA[selectedIdx];
+
+  // Update Breadcrumbs & Navigation
+  const backBtn = document.getElementById("btn-back-state");
+  const bSep = document.getElementById("breadcrumb-sep");
+  const bDist = document.getElementById("breadcrumb-district");
+  const btnState = document.getElementById("btn-view-state");
+  const btnTaluka = document.getElementById("btn-view-taluka");
+  const distSelect = document.getElementById("sel-district-taluka");
+
+  if (distSelect) distSelect.value = currentDist.name;
+
+  const tCount = (TALUKA_DATA[currentDist.name] ? TALUKA_DATA[currentDist.name].items.length : 0);
+  if (btnTaluka) btnTaluka.textContent = `📍 Talukas (${tCount})`;
+
+  if (currentView === "state") {
+    if (backBtn) backBtn.style.display = "none";
+    if (bSep) bSep.style.display = "none";
+    if (bDist) bDist.style.display = "none";
+    if (btnState) btnState.classList.add("active");
+    if (btnTaluka) btnTaluka.classList.remove("active");
+
+    const modeTitles = { solar: "Solar Suitability Heatmap", wind: "Wind Suitability Heatmap", hybrid: "Hybrid (Solar + Wind) Suitability Heatmap" };
+    document.getElementById("map-heading").textContent = modeTitles[currentMode];
+    document.getElementById("map-subheading").textContent = "Geographic tile matrix of 34 Maharashtra districts • Click any district to view its Taluka Map";
+
+    // Render State Map SVG
+    svg.innerHTML = DATA.map((d, i) => {
+      const x = d.col * (S + G) + PAD_X;
+      const y = d.row * (S + G) + PAD_Y;
+      const isSel = (i === selectedIdx);
+      const nm = d.name.replace("Chh. Sambhajinagar", "Sambhajinagar");
+      const sc = scores[i].toFixed(1);
+      const fill = interpolateColor(scores[i]);
+
+      return `<g>
+        <rect class="tile${isSel ? ' sel' : ''}" data-i="${i}" x="${x}" y="${y}" width="${S}" height="${S}" rx="8" fill="${fill}" tabindex="0" role="button" aria-label="${d.name} score ${sc}"/>
+        <text class="lbl-name" x="${x + S/2}" y="${y + S/2 - 3}">${nm.length > 9 ? nm.slice(0, 8) + '…' : nm}</text>
+        <text class="lbl-score" x="${x + S/2}" y="${y + S/2 + 13}">${scores[i].toFixed(0)}</text>
+      </g>`;
+    }).join("");
+
+    // Update Top 5 District Leaderboard
+    const ranked = scores.map((s, idx) => ({ s, idx })).sort((a, b) => b.s - a.s);
+    document.getElementById("rank-list").innerHTML = ranked.slice(0, 5).map((item, n) => {
+      const d = DATA[item.idx];
+      const isAct = (item.idx === selectedIdx);
+      return `<li class="rank-item${isAct ? ' active' : ''}" data-i="${item.idx}">
+        <span class="rank-pos">#${n + 1}</span>
+        <span class="rank-name">${d.name}</span>
+        <span class="rank-score" style="color:${interpolateColor(item.s)}">${item.s.toFixed(1)}</span>
+      </li>`;
+    }).join("");
+
+  } else {
+    // Taluka Map View
+    if (backBtn) backBtn.style.display = "inline-flex";
+    if (bSep) bSep.style.display = "inline";
+    if (bDist) {
+      bDist.style.display = "inline";
+      bDist.textContent = `${currentDist.name} (${tCount} Talukas)`;
+    }
+    if (btnState) btnState.classList.remove("active");
+    if (btnTaluka) btnTaluka.classList.add("active");
+
+    const modeLabels = { solar: "Solar", wind: "Wind", hybrid: "Hybrid" };
+    document.getElementById("map-heading").textContent = `${currentDist.name} — ${modeLabels[currentMode]} Taluka Map`;
+    document.getElementById("map-subheading").textContent = `Actual taluka boundaries with score pins for ${currentDist.name} - click a pin to inspect its metrics`;
+
+    renderTalukaCartogram(currentDist, scores);
+
+    // Update Taluka Leaderboard in Right Panel
+    const tData = TALUKA_DATA[currentDist.name];
+    if (tData) {
+      const scoredTalukas = tData.items.map(t => ({
+        t,
+        s: calculateTalukaScore(t)
+      })).sort((a, b) => b.s - a.s);
+
+      document.getElementById("rank-list").innerHTML = scoredTalukas.map((item, n) => {
+        const isAct = (selectedTaluka && selectedTaluka.name === item.t.name);
+        return `<li class="rank-item${isAct ? ' active' : ''}" data-taluka="${item.t.name}">
+          <span class="rank-pos">#${n + 1}</span>
+          <span class="rank-name">${item.t.name}</span>
+          <span class="rank-score" style="color:${interpolateColor(item.s)}">${item.s.toFixed(1)}</span>
+        </li>`;
+      }).join("");
+    }
+  }
 
   // Update Legend Gradient
   document.getElementById("legend-gradient").style.background =
     `linear-gradient(90deg, ${interpolateColor(0)}, ${interpolateColor(50)}, ${interpolateColor(100)})`;
-
-  // Update Heading
-  const titles = { solar: "Solar Suitability Heatmap", wind: "Wind Suitability Heatmap", hybrid: "Hybrid (Solar + Wind) Suitability Heatmap" };
-  document.getElementById("map-heading").textContent = titles[currentMode];
-
-  // Update Top 5 Leaderboard
-  const ranked = scores.map((s, idx) => ({ s, idx })).sort((a, b) => b.s - a.s);
-  const rankHtml = ranked.slice(0, 5).map((item, n) => {
-    const d = DATA[item.idx];
-    const isAct = (item.idx === selectedIdx);
-    return `<li class="rank-item${isAct ? ' active' : ''}" data-i="${item.idx}">
-      <span class="rank-pos">#${n + 1}</span>
-      <span class="rank-name">${d.name}</span>
-      <span class="rank-score" style="color:${interpolateColor(item.s)}">${item.s.toFixed(1)}</span>
-    </li>`;
-  }).join("");
-  document.getElementById("rank-list").innerHTML = rankHtml;
 
   renderInspector(scores);
 }
@@ -1306,14 +1691,113 @@ function renderInspector(scores) {
   if (selectedIdx === null || !DATA[selectedIdx]) return;
   const d = DATA[selectedIdx];
   const sc = scores[selectedIdx];
-  const f = calculateFactors(d);
+  const barColor = currentMode === "solar" ? "var(--solar-gold)" : (currentMode === "wind" ? "var(--wind-cyan)" : "var(--hybrid-emerald)");
+  const tData = TALUKA_DATA[d.name];
 
+  if (currentView === "taluka" && selectedTaluka) {
+    const t = selectedTaluka;
+    const tScore = calculateTalukaScore(t);
+    const tf = calculateTalukaFactors(t);
+
+    let tTierText = "Moderate Potential";
+    if (tScore >= 75) tTierText = "Prime Taluka Hotspot";
+    else if (tScore >= 65) tTierText = "High Potential";
+    else if (tScore < 50) tTierText = "Constrained Taluka";
+
+    const items = tData ? tData.items : [];
+    const scoredTalukas = items.map(item => ({ name: item.name, s: calculateTalukaScore(item) })).sort((a, b) => b.s - a.s);
+    const rkInDist = (scoredTalukas.findIndex(x => x.name === t.name) + 1) || 1;
+
+    const html = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <span style="font-size:11px;font-weight:700;color:var(--text-sub);text-transform:uppercase;">Sub-District Taluka</span>
+          <h3 style="font-size:19px;font-weight:800;color:#f8fafc;margin-top:2px;">${t.name}</h3>
+          <small style="color:var(--text-mute);">${d.name} District • (${t.lat.toFixed(2)}°N, ${t.lon.toFixed(2)}°E)</small>
+        </div>
+        <div style="text-align:right;">
+          <span style="font-size:24px;font-weight:900;color:${interpolateColor(tScore)};">${tScore.toFixed(1)}</span>
+          <small style="color:var(--text-sub);"> / 100</small>
+        </div>
+      </div>
+
+      <div style="margin:8px 0 14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+        <span class="score-badge" style="background:${tScore >= 70 ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'};color:${tScore >= 70 ? '#34d399' : '#f87171'};border:1px solid ${tScore >= 70 ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)'};">${tTierText}</span>
+        <span style="font-size:11.5px;font-weight:700;color:var(--solar-gold);background:rgba(245,158,11,0.15);padding:2px 8px;border-radius:10px;border:1px solid rgba(245,158,11,0.3);">
+          #${rkInDist} of ${items.length} in ${d.name}
+        </span>
+        <span style="font-size:11.5px;color:var(--text-sub);background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:10px;">
+          State Rank: #${t.state_solar_rank} / 150
+        </span>
+      </div>
+
+      <!-- Factor Progress Bars for Taluka -->
+      ${Object.keys(tf).map(k => `
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-mute);margin-top:4px;">
+          <span>${FACTOR_NAMES[k]}</span>
+          <strong style="color:#fff;">${(tf[k] * 100).toFixed(0)}%</strong>
+        </div>
+        <div class="factor-bar">
+          <div class="factor-bar-fill" style="width:${Math.max(3, tf[k] * 100)}%;background:${barColor};"></div>
+        </div>
+      `).join("")}
+
+      <!-- Physical Ground Metrics for Taluka -->
+      <div class="metrics-grid" style="margin-top:12px;">
+        <div class="metric-pill">
+          <div class="lbl">☀️ Solar GHI</div>
+          <div class="val">${t.solar_ghi} <span style="font-size:11px;font-weight:normal;">kWh/m²/d</span></div>
+        </div>
+        <div class="metric-pill">
+          <div class="lbl">💨 Wind Density (100m)</div>
+          <div class="val">${t.wind_wpd} <span style="font-size:11px;font-weight:normal;">W/m²</span></div>
+        </div>
+        <div class="metric-pill">
+          <div class="lbl">⚡ Substation Grid</div>
+          <div class="val">${t.substation_dist} <span style="font-size:11px;font-weight:normal;">km</span></div>
+        </div>
+        <div class="metric-pill">
+          <div class="lbl">🏜️ Barren Wasteland</div>
+          <div class="val">${t.barren_pct}%</div>
+        </div>
+        <div class="metric-pill">
+          <div class="lbl">⛰️ Terrain Slope</div>
+          <div class="val">${t.slope}°</div>
+        </div>
+        <div class="metric-pill">
+          <div class="lbl">🎯 Siting Suitability</div>
+          <div class="val" style="color:${interpolateColor(tScore)};">${tScore >= 75 ? 'Prime Hub' : (tScore >= 60 ? 'Feasible' : 'Marginal')}</div>
+        </div>
+      </div>
+
+      <!-- Quick Switcher to Other Talukas in District -->
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="font-size:11.5px;color:var(--text-sub);font-weight:700;margin-bottom:6px;display:flex;justify-content:space-between;">
+          <span>Talukas in ${d.name} (${items.length}):</span>
+          <a href="javascript:void(0)" onclick="setMapView('state')" style="color:var(--wind-cyan);text-decoration:none;font-size:11px;">← State Overview</a>
+        </div>
+        <div class="taluka-mini-list">
+          ${items.map(item => {
+            const isCurr = (item.name === t.name);
+            const isc = calculateTalukaScore(item);
+            return `<div class="taluka-mini-item${isCurr ? ' active' : ''}" onclick="setMapView('taluka', null, '${item.name}')">
+              <span style="font-size:11.5px;font-weight:${isCurr ? '700' : '500'};color:${isCurr ? '#fff' : 'var(--text-sub)'}">${item.name}</span>
+              <strong style="font-size:12px;color:${interpolateColor(isc)}">${isc.toFixed(0)}</strong>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+    `;
+    document.getElementById("inspector-body").innerHTML = html;
+    return;
+  }
+
+  // Otherwise, District Overview
+  const f = calculateFactors(d);
   let tierClass = "moderate", tierText = "Moderate Potential";
   if (sc >= 75) { tierClass = "very-high"; tierText = "Very High Siting Potential"; }
   else if (sc >= 65) { tierClass = "high"; tierText = "High Potential"; }
   else if (sc < 50) { tierClass = "low"; tierText = "Low / Constrained"; }
-
-  const barColor = currentMode === "solar" ? "var(--solar-gold)" : (currentMode === "wind" ? "var(--wind-cyan)" : "var(--hybrid-emerald)");
 
   const html = `
     <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -1368,10 +1852,29 @@ function renderInspector(scores) {
     </div>
 
     <!-- Operational Plant Ground Truth -->
-    <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:14px;font-size:13px;">
+    <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:12px;font-size:12.5px;">
       <div style="font-size:11px;color:var(--text-sub);text-transform:uppercase;font-weight:700;margin-bottom:4px;">Operational Ground Truth (MNRE / MSEDCL)</div>
       Existing Solar: <strong style="color:var(--solar-gold);">${d.exist_solar_mw} MW</strong> | Existing Wind: <strong style="color:var(--wind-cyan);">${d.exist_wind_mw} MW</strong>
     </div>
+
+    <!-- Sub-District Talukas Mini-Cartogram List -->
+    ${tData && tData.items.length ? `
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:12px;font-weight:700;color:#f8fafc;">Talukas in ${d.name} (${tData.items.length})</span>
+          <button onclick="setMapView('taluka')" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--solar-gold);font-size:11px;padding:3px 8px;border-radius:4px;cursor:pointer;">Open Taluka Map ↗</button>
+        </div>
+        <div class="taluka-mini-list">
+          ${tData.items.map(t => {
+            const tScore = calculateTalukaScore(t);
+            return `<div class="taluka-mini-item" onclick="setMapView('taluka', null, '${t.name}')">
+              <span style="font-size:11.5px;color:var(--text-sub);">${t.name}</span>
+              <strong style="font-size:12px;color:${interpolateColor(tScore)};">${tScore.toFixed(0)}</strong>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+    ` : ''}
   `;
   document.getElementById("inspector-body").innerHTML = html;
 }
@@ -1399,18 +1902,44 @@ function updateSliders() {
 
 /* Event Handlers */
 svg.addEventListener("click", e => {
-  const tile = e.target.closest("[data-i]");
-  if (tile) {
-    selectedIdx = parseInt(tile.dataset.i);
-    renderStudio();
+  // In state view, clicking a district drills into its Taluka Map
+  const distTile = e.target.closest("[data-i]");
+  if (distTile) {
+    const idx = parseInt(distTile.dataset.i);
+    selectedIdx = idx;
+    setMapView("taluka");
+    return;
+  }
+
+  // In taluka view, clicking a taluka tile inspects it
+  const talukaTile = e.target.closest("[data-taluka]");
+  if (talukaTile && currentView === "taluka") {
+    const tName = talukaTile.dataset.taluka;
+    const dName = DATA[selectedIdx].name;
+    const tData = TALUKA_DATA[dName];
+    if (tData) {
+      selectedTaluka = tData.items.find(t => t.name === tName) || null;
+      renderStudio();
+    }
   }
 });
 
 document.getElementById("rank-list").addEventListener("click", e => {
-  const item = e.target.closest("[data-i]");
-  if (item) {
-    selectedIdx = parseInt(item.dataset.i);
-    renderStudio();
+  const distItem = e.target.closest("[data-i]");
+  if (distItem) {
+    selectedIdx = parseInt(distItem.dataset.i);
+    setMapView("taluka");
+    return;
+  }
+  const talukaItem = e.target.closest("[data-taluka]");
+  if (talukaItem) {
+    const tName = talukaItem.dataset.taluka;
+    const dName = DATA[selectedIdx].name;
+    const tData = TALUKA_DATA[dName];
+    if (tData) {
+      selectedTaluka = tData.items.find(t => t.name === tName) || null;
+      renderStudio();
+    }
   }
 });
 
@@ -1486,6 +2015,7 @@ window.addEventListener("keydown", e => {
 });
 
 // Initial boot
+initDistrictDropdown();
 updateSliders();
 renderStudio();
 </script>
